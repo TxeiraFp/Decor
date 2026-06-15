@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Login - Raridade Store</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+body {
+    background: #f6f7fb;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* CONTAINER PRINCIPAL */
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+}
+
+/* LADO DA IMAGEM */
+.login-left {
+    flex: 1;
+    background: url("../assents/mod.jpg") center/cover no-repeat;
+    position: relative;
+}
+
+/* overlay escuro */
+.login-left::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+}
+
+/* TEXTO SOBRE IMAGEM (opcional) */
+.login-left-content {
+    position: relative;
+    z-index: 2;
+    color: #fff;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px;
+}
+
+.login-left h1 {
+    font-size: 42px;
+    font-weight: bold;
+}
+
+/* LADO DO FORM */
+.login-right {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+}
+
+/* CARD LOGIN */
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    padding: 35px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+/* LOGO */
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo img {
+    height: 50px;
+}
+
+/* INPUTS */
+.form-control {
+    border-radius: 10px;
+    padding: 12px;
+}
+
+/* BOTÃO */
+.btn-login {
+    width: 100%;
+    border-radius: 10px;
+    padding: 12px;
+    background: #000;
+    color: #fff;
+    border: none;
+    margin-top: 10px;
+}
+
+.btn-login:hover {
+    background: #222;
+}
+
+/* LINKS */
+.small-links {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+
+   .login-wrapper {
+        flex-direction: column;
+    }
+
+    /* some com a imagem */
+    .login-left {
+        display: none;
+    }
+
+    /* FAZ O CONTAINER OCUPAR TELA TODA */
+    .login-right {
+        width: 100%;
+        min-height: 100vh;   /* <- chave */
+        padding: 0;          /* remove espaçamento */
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+    }
+
+    /* CARD OCUPA TELA QUASE INTEIRA */
+    .login-card {
+        width: 100%;
+        height: 100vh;       /* <- chave */
+        max-width: 100%;
+        border-radius: 0;    /* visual full screen */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 30px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="login-wrapper">
+
+    <!-- IMAGEM LADO ESQUERDO -->
+    <div class="login-left">
+        <div class="login-left-content">
+            <h1>Raridade Store</h1>
+            <p>Moda streetwear premium com identidade.</p>
+        </div>
+    </div>
+
+    <!-- FORM LADO DIREITO -->
+    <div class="login-right">
+
+        <div class="login-card">
+
+            <div class="logo">
+                <img src="../assents/RARIDADE-STORE.png" alt="logo">
+            </div>
+
+            <h4 class="text-center mb-4">Entrar na conta</h4>
+
+            <form onsubmit="login(event)">
+
+                <input type="email" id="email" class="form-control mb-3" placeholder="Email" required>
+
+                <input type="password" id="password" class="form-control mb-3" placeholder="Senha" required>
+
+                <button type="submit" class="btn-login">Entrar</button>
+
+            </form>
+
+            <div class="small-links">
+                <p>Não tem conta? <a href="../registrePages/index.html">Criar conta</a></p>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const API = "http://localhost:8008";
+
+async function login(event) {
+    event.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try {
+        const response = await fetch(`${API}/session`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (data.token) {
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("user", JSON.stringify(data.usuario));
+
+            alert("Login realizado com sucesso!");
+            window.location.href = "/";
+        } else {
+            alert(data.error || "Erro no login");
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert("Erro ao conectar com servidor");
+    }
+}
+
+</script>
+
+</body>
+</html>

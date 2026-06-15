@@ -1,27 +1,48 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const mongoose = require('mongoose');
-const routes = require('./routes/index');
+const routes = require('./routes');
 
 dotenv.config();
 
-const app =  express();
-app.use(cors());
+const app = express();
+
+/**
+ * MIDDLEWARES
+ */
 app.use(express.json());
+app.use(cors({ origin: "*" }));
+
+/**
+ * LOGGER (TEM QUE VIR ANTES DAS ROTAS)
+ */
+app.use((req, res, next) => {
+  console.log("➡️ REQUEST:", req.method, req.url);
+  next();
+});
+
+/**
+ * STATIC (FRONTEND)
+ */
+app.use(express.static("public"));
+
+/**
+ * ROTAS API
+ */
 app.use(routes);
 
- const connectDB =  async () => {
-    try {
-        await mongoose.connect(process.env.MONGO_URI);
-        console.log('Conectado ao MongoDB com sucesso!');
-    } catch (error) {
-        console.error('Erro ao conectar ao MongoDB:',  error);
-    }
-};
+/**
+ * FALLBACK (opcional)
+ */
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/public/index.html");
+});
 
-connectDB();
+/**
+ * PORT
+ */
+const PORT = process.env.PORT || 3000;
 
-app.listen(process.env.PORT, ()=> {
-    console.log('servidor rodando na porta', process.env.PORT);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 servidor rodando em http://localhost:${PORT}`);
 });

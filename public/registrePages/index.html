@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Registrar - Raridade Store</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+body {
+    background: #f6f7fb;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* LAYOUT PRINCIPAL */
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+}
+
+/* LADO IMAGEM */
+.login-left {
+    flex: 1;
+    background: url("../assents/mod.jpg") center/cover no-repeat;
+    position: relative;
+}
+
+.login-left::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+}
+
+.login-left-content {
+    position: relative;
+    z-index: 2;
+    color: #fff;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px;
+}
+
+.login-left h1 {
+    font-size: 42px;
+    font-weight: bold;
+}
+
+/* LADO FORM */
+.login-right {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+}
+
+/* CARD */
+.login-card {
+    width: 100%;
+    max-width: 450px;
+    background: #fff;
+    padding: 35px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+/* LOGO */
+.logo {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.logo img {
+    height: 50px;
+}
+
+/* INPUTS */
+.form-control {
+    border-radius: 10px;
+    padding: 12px;
+}
+
+/* BOTÃO */
+.btn-register {
+    width: 100%;
+    border-radius: 10px;
+    padding: 12px;
+    background: #000;
+    color: #fff;
+    border: none;
+    margin-top: 10px;
+}
+
+.btn-register:hover {
+    background: #222;
+}
+
+/* LINKS */
+.small-links {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+/* RESPONSIVO MOBILE */
+@media (max-width: 768px) {
+
+    .login-wrapper {
+        flex-direction: column;
+    }
+
+    .login-left {
+        display: none;
+    }
+
+    .login-right {
+        width: 100%;
+        min-height: 100vh;
+        padding: 0;
+    }
+
+    .login-card {
+        width: 100%;
+        height: 100vh;
+        max-width: 100%;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 30px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="login-wrapper">
+
+    <!-- IMAGEM -->
+    <div class="login-left">
+        <div class="login-left-content">
+            <h1>Raridade Store</h1>
+            <p>Crie sua conta e comece a comprar com estilo.</p>
+        </div>
+    </div>
+
+    <!-- FORM -->
+    <div class="login-right">
+
+        <div class="login-card">
+
+            <div class="logo">
+                <img src="../assents/RARIDADE-STORE.png" alt="logo">
+            </div>
+
+            <h4 class="text-center mb-4">Criar conta</h4>
+
+            <form onsubmit="register(event)">
+
+                <input type="text" id="name" class="form-control mb-3" placeholder="Nome completo" required>
+
+                <input type="email" id="email" class="form-control mb-3" placeholder="Email" required>
+
+                <input type="password" id="password" class="form-control mb-3" placeholder="Senha" required>
+
+                <input type="password" id="confirm" class="form-control mb-3" placeholder="Confirmar senha" required>
+
+                <button type="submit" class="btn-register">Criar conta</button>
+
+            </form>
+
+            <div class="small-links">
+                <p>Já tem conta? <a href="../loginPages/index.html">Entrar</a></p>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const API = "http://localhost:8008";
+
+async function register(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const confirm = document.getElementById("confirm").value;
+
+    if (password !== confirm) {
+        alert("Senhas não conferem!");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API}/users`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name,
+                email,
+                password
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.id || data.user) {
+            alert("Conta criada com sucesso!");
+            window.location.href = "../loginPages/index.html";
+        } else {
+            alert(data.error || "Erro ao registrar");
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert("Erro ao conectar com servidor");
+    }
+}
+
+</script>
+
+</body>
+</html>
