@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Editar Produto</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body { background:#f5f6fa; font-family:Arial; }
+
+.card-box{
+    background:#fff;
+    border-radius:15px;
+    padding:25px;
+    box-shadow:0 5px 20px rgba(0,0,0,.05);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container py-5">
+
+    <a href="./listar.html" class="btn btn-outline-dark mb-3">← Voltar</a>
+
+    <div class="card-box">
+
+        <h4 class="mb-3">✏️ Editar Produto</h4>
+
+        <form onsubmit="updateProduct(event)">
+
+            <input id="name" class="form-control mb-2" placeholder="Nome" required>
+
+            <textarea id="description" class="form-control mb-2" placeholder="Descrição"></textarea>
+
+            <input id="price" class="form-control mb-2" placeholder="Preço (ex: 99,90)" required>
+
+            <select id="categoryId" class="form-control mb-3" required>
+                <option value="">Carregando categorias...</option>
+            </select>
+
+            <label class="mb-1">Imagem do produto</label>
+            <input type="file" id="images" class="form-control mb-3" accept="image/*">
+
+            <h6>Variante</h6>
+
+            <input id="size" class="form-control mb-2" placeholder="Tamanho">
+
+            <input id="color" class="form-control mb-2" placeholder="Cor">
+
+            <input id="stock" type="number" class="form-control mb-3" placeholder="Estoque">
+
+            <button class="btn btn-primary w-100" id="btn">
+                Atualizar Produto
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+
+const API = "http://192.168.1.105:8008";
+
+const params = new URLSearchParams(window.location.search);
+const productId = params.get("id");
+
+/* =========================
+   PREÇO
+========================= */
+function toCents(value){
+    if(!value) return 0;
+
+    return Math.round(
+        Number(value.replace(/\./g, "").replace(",", ".")) * 100
+    );
+}
+
+function fromCents(value){
+    return (Number(value) / 100).toFixed(2).replace(".", ",");
+}
+
+/* =========================
+   UPLOAD IMAGEM
+========================= */
+async function upload(file){
+
+    const form = new FormData();
+    form.append("image", file);
+
+    const res = await fetch(`${API}/upload`, {
+        method: "POST",
+        body: form
+    });
+
+    const data = await res.json();
+
+    if(!res.ok || !data.imageUrl){
+        throw new Error("Erro upload");
+    }
+
+    return data.imageUrl;
+}
+
+/* =========================
+   LOAD CATEGORIES
+========================= */
+async function loadCategories(selectedId){
+
+    const res = await fetch(`${API}/categories`);
+    const data = await res.json();
+
+    const select = document.getElementById("categoryId");
+
+    select.innerHTML = `<option value="">Selecione</option>`;
+
+    data.forEach(cat => {
+        select.innerHTML += `
+            <option value="${cat.id}" ${cat.id === selectedId ? "selected" : ""}>
+                ${cat.name}
+            </option>
+        `;
+    });
+}
+
+/* =========================
+   LOAD PRODUCT
+========================= */
+async function loadProduct(){
+
+    const res = await fetch(`${API}/products/${productId}`);
+    const p = await res.json();
+
+    document.getElementById("name").value = p.name || "";
+    document.getElementById("description").value = p.description || "";
+    document.getElementById("price").value = fromCents(p.price);
+
+    const variant = p.variants?.[0] || {};
+    document.getElementById("size").value = variant.size || "";
+    document.getElementById("color").value = variant.color || "";
+    document.getElementById("stock").value = variant.stock?.quantity || 0;
+
+    await loadCategories(p.category?.id || p.categoryId);
+}
+
+/* =========================
+   UPDATE PRODUCT
+========================= */
+async function updateProduct(e){
+    e.preventDefault();
+
+    const btn = document.getElementById("btn");
+    btn.disabled = true;
+    btn.innerText = "Atualizando...";
+
+    const file = document.getElementById("images").files[0];
+
+    let images = [];
+
+    try {
+        if(file){
+            const url = await upload(file);
+            images.push(url);
+        }
+    } catch (err) {
+        alert("Erro ao enviar imagem");
+        btn.disabled = false;
+        btn.innerText = "Atualizar Produto";
+        return;
+    }
+
+    const size = document.getElementById("size").value;
+    const color = document.getElementById("color").value;
+    const stock = document.getElementById("stock").value;
+
+    const payload = {
+        name: document.getElementById("name").value,
+        description: document.getElementById("description").value,
+        price: toCents(document.getElementById("price").value),
+        categoryId: document.getElementById("categoryId").value,
+
+        ...(images.length > 0 && { images }),
+
+        variants: (size || color || stock) ? [
+            {
+                size,
+                color,
+                stock: {
+                    quantity: Number(stock || 0)
+                }
+            }
+        ] : []
+    };
+
+    try {
+
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(`${API}/products/${productId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if(!res.ok){
+            alert(data.error || "Erro ao atualizar");
+            return;
+        }
+
+        alert("Produto atualizado com sucesso!");
+        window.location.href = "./listar.html";
+
+    } catch (err) {
+        alert("Erro de conexão com servidor");
+    }
+
+    btn.disabled = false;
+    btn.innerText = "Atualizar Produto";
+}
+
+/* INIT */
+loadProduct();
+
+</script>
+
+</body>
+</html>

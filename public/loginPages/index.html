@@ -7,6 +7,7 @@
 <title>Login - Raridade Store</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
 <style>
 
@@ -15,20 +16,19 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
-/* CONTAINER PRINCIPAL */
+/* CONTAINER */
 .login-wrapper {
     min-height: 100vh;
     display: flex;
 }
 
-/* LADO DA IMAGEM */
+/* IMAGEM */
 .login-left {
     flex: 1;
     background: url("../assents/mod.jpg") center/cover no-repeat;
     position: relative;
 }
 
-/* overlay escuro */
 .login-left::after {
     content: "";
     position: absolute;
@@ -36,7 +36,6 @@ body {
     background: rgba(0,0,0,0.45);
 }
 
-/* TEXTO SOBRE IMAGEM (opcional) */
 .login-left-content {
     position: relative;
     z-index: 2;
@@ -53,7 +52,7 @@ body {
     font-weight: bold;
 }
 
-/* LADO DO FORM */
+/* FORM */
 .login-right {
     flex: 1;
     display: flex;
@@ -62,7 +61,6 @@ body {
     padding: 30px;
 }
 
-/* CARD LOGIN */
 .login-card {
     width: 100%;
     max-width: 420px;
@@ -82,13 +80,13 @@ body {
     height: 50px;
 }
 
-/* INPUTS */
+/* INPUT */
 .form-control {
     border-radius: 10px;
     padding: 12px;
 }
 
-/* BOTÃO */
+/* BOTÃO LOGIN */
 .btn-login {
     width: 100%;
     border-radius: 10px;
@@ -97,10 +95,49 @@ body {
     color: #fff;
     border: none;
     margin-top: 10px;
+    font-weight: 500;
 }
 
 .btn-login:hover {
     background: #222;
+}
+
+/* BOTÃO GOOGLE PADRONIZADO */
+.btn-google {
+    width: 100%;
+    border-radius: 10px;
+    padding: 12px;
+    background: #fff;
+    color: #333;
+    border: 1px solid #ddd;
+    margin-top: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.btn-google:hover {
+    background: #f5f5f5;
+}
+
+/* PASSWORD */
+.password-group .form-control {
+    border-right: 0;
+    box-shadow: none !important;
+}
+
+.password-group .btn {
+    border-left: 0;
+    background: #fff;
+}
+
+.password-group .btn:hover {
+    background: #f2f2f2;
 }
 
 /* LINKS */
@@ -110,35 +147,31 @@ body {
     font-size: 14px;
 }
 
-
 /* RESPONSIVO */
 @media (max-width: 768px) {
 
-   .login-wrapper {
+    .login-wrapper {
         flex-direction: column;
     }
 
-    /* some com a imagem */
     .login-left {
         display: none;
     }
 
-    /* FAZ O CONTAINER OCUPAR TELA TODA */
     .login-right {
         width: 100%;
-        min-height: 100vh;   /* <- chave */
-        padding: 0;          /* remove espaçamento */
+        min-height: 100vh;
+        padding: 0;
         display: flex;
         align-items: stretch;
         justify-content: center;
     }
 
-    /* CARD OCUPA TELA QUASE INTEIRA */
     .login-card {
         width: 100%;
-        height: 100vh;       /* <- chave */
+        height: 100vh;
         max-width: 100%;
-        border-radius: 0;    /* visual full screen */
+        border-radius: 0;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -153,7 +186,7 @@ body {
 
 <div class="login-wrapper">
 
-    <!-- IMAGEM LADO ESQUERDO -->
+    <!-- LEFT -->
     <div class="login-left">
         <div class="login-left-content">
             <h1>Raridade Store</h1>
@@ -161,13 +194,13 @@ body {
         </div>
     </div>
 
-    <!-- FORM LADO DIREITO -->
+    <!-- RIGHT -->
     <div class="login-right">
 
         <div class="login-card">
 
             <div class="logo">
-                <img src="../assents/RARIDADE-STORE.png" alt="logo">
+                <img src="../assents/RARIDADE-STORE.png">
             </div>
 
             <h4 class="text-center mb-4">Entrar na conta</h4>
@@ -176,9 +209,40 @@ body {
 
                 <input type="email" id="email" class="form-control mb-3" placeholder="Email" required>
 
-                <input type="password" id="password" class="form-control mb-3" placeholder="Senha" required>
+                <!-- PASSWORD -->
+                <div class="input-group mb-3 password-group">
 
-                <button type="submit" class="btn-login">Entrar</button>
+                    <input type="password"
+                        id="password"
+                        class="form-control"
+                        placeholder="Senha"
+                        required>
+
+                    <button class="btn border d-flex align-items-center justify-content-center"
+                            type="button"
+                            onclick="togglePassword()"
+                            style="width: 48px;">
+
+                        <i class="bi bi-eye fs-5" id="eyeIcon"></i>
+
+                    </button>
+
+                </div>
+
+                <!-- LOGIN -->
+                <button type="submit" class="btn-login">
+                    Entrar
+                </button>
+
+                <!-- GOOGLE -->
+                <button type="button"
+                        class="btn-google"
+                        onclick="loginGoogle()">
+
+                    <i class="bi bi-google"></i>
+                    Entrar com Google
+
+                </button>
 
             </form>
 
@@ -194,8 +258,9 @@ body {
 
 <script>
 
-const API = "http://localhost:8008";
+const API = "http://192.168.1.105:8008";
 
+/* LOGIN */
 async function login(event) {
     event.preventDefault();
 
@@ -203,28 +268,55 @@ async function login(event) {
     const password = document.getElementById("password").value;
 
     try {
-        const response = await fetch(`${API}/session`, {
+
+        const res = await fetch(`${API}/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password })
         });
 
-        const data = await response.json();
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.error || "Erro ao fazer login");
+            return;
+        }
 
         if (data.token) {
+
             localStorage.setItem("token", data.token);
             localStorage.setItem("user", JSON.stringify(data.usuario));
 
-            alert("Login realizado com sucesso!");
-            window.location.href = "/";
-        } else {
-            alert(data.error || "Erro no login");
+            if (data.usuario.role === "ADMIN") {
+                window.location.href = "../adminPages/index.html";
+            } else {
+                window.location.href = "../index.html";
+            }
         }
 
-    } catch (error) {
-        console.error(error);
-        alert("Erro ao conectar com servidor");
+    } catch (err) {
+        console.error(err);
+        alert("Erro ao conectar com o servidor.");
     }
+}
+
+/* TOGGLE PASSWORD */
+function togglePassword() {
+    const input = document.getElementById("password");
+    const icon = document.getElementById("eyeIcon");
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.replace("bi-eye", "bi-eye-slash");
+    } else {
+        input.type = "password";
+        icon.classList.replace("bi-eye-slash", "bi-eye");
+    }
+}
+
+/* GOOGLE LOGIN */
+function loginGoogle() {
+    window.location.href = `${API}/auth/google`;
 }
 
 </script>

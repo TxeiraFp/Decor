@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listar Produtos</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body { background:#f5f6fa; font-family:Arial; }
+.card-prod {
+  border:none;
+  border-radius:15px;
+  overflow:hidden;
+  transition:.3s;
+  height:100%;
+}
+.card-prod:hover {
+  transform:translateY(-5px);
+  box-shadow:0 10px 25px rgba(0,0,0,.1);
+}
+.desc {
+  font-size:14px;
+  color:#555;
+  white-space:pre-line;
+}
+/* CAROUSEL */
+.carousel-inner img {
+  height:220px;
+  object-fit:contain;
+  width:100%;
+  background:#fff;
+}
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color:rgba(0,0,0,.3);
+  border-radius:50%;
+  padding:10px;
+}
+.carousel-indicators [data-bs-target] {
+  background-color:#333;
+}
+.no-image {
+  height:220px;
+  background:#eee;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#aaa;
+  font-size:14px;
+}
+</style>
+</head>
+<body>
+<div class="container py-5">
+  <a href="./index.html" class="btn btn-outline-dark mb-3">← Voltar</a>
+  <h3 class="mb-4">📋 Produtos</h3>
+  <div class="row" id="list"></div>
+</div>
+
+<script>
+const API = "http://192.168.1.105:8008";
+
+function formatPrice(value) {
+  if (value == null) return "R$ 0,00";
+  return "R$ " + (Number(value) / 100).toFixed(2).replace(".", ",");
+}
+
+function safe(v) { return v || "Não informado"; }
+
+function buildCarousel(images, productId) {
+  if (!images || images.length === 0) {
+    return `<div class="no-image">📷 Sem imagem</div>`;
+  }
+
+  if (images.length === 1) {
+    return `<img src="${images[0]}" class="w-100" style="height:220px;object-fit:contain;background:#fff;">`;
+  }
+
+  const id = `carousel-${productId}`;
+
+  const indicators = images.map((_, i) => `
+    <button type="button" data-bs-target="#${id}" data-bs-slide-to="${i}"
+      ${i === 0 ? 'class="active"' : ''} aria-label="Foto ${i+1}"></button>
+  `).join("");
+
+  const slides = images.map((img, i) => `
+    <div class="carousel-item ${i === 0 ? 'active' : ''}">
+      <img src="${img}" class="d-block w-100" style="height:220px;object-fit:contain;background:#fff;">
+    </div>
+  `).join("");
+
+  return `
+    <div id="${id}" class="carousel slide" data-bs-ride="false">
+      <div class="carousel-indicators">${indicators}</div>
+      <div class="carousel-inner">${slides}</div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#${id}" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#${id}" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+      </button>
+    </div>
+  `;
+}
+
+async function load() {
+  const res = await fetch(`${API}/products`);
+  const data = await res.json();
+  const el = document.getElementById("list");
+  el.innerHTML = "";
+
+  data.forEach(p => {
+    const variant  = p.variants?.[0] || {};
+    const size     = variant.size  || "—";
+    const color    = variant.color || "—";
+    const stock    = variant?.stock?.quantity ?? 0;
+    const category = p.category?.name || "Categoria não informada";
+
+    el.innerHTML += `
+      <div class="col-md-4 mb-4">
+        <div class="card card-prod shadow-sm">
+          ${buildCarousel(p.images, p.id)}
+          <div class="p-3">
+            <h5 class="mb-1">${p.name}</h5>
+            <p class="desc mb-2">${safe(p.description)}</p>
+            <div class="mb-2">
+              <span class="badge bg-secondary">📦 ${category}</span>
+              <span class="badge bg-dark">📏 ${size}</span>
+              <span class="badge bg-info text-dark">🎨 ${color}</span>
+              <span class="badge bg-success">🔢 ${stock}</span>
+            </div>
+            <strong>${formatPrice(p.price)}</strong>
+            <div class="mt-3 d-flex gap-2">
+              <button class="btn btn-sm btn-primary" onclick="editProduct('${p.id}')">Editar</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteProduct('${p.id}')">Apagar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+async function deleteProduct(id) {
+  if (!confirm("Deseja realmente apagar?")) return;
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API}/products/${id}`, {
+    method: "DELETE",
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+  const data = await res.json();
+  if (!res.ok) { alert(data.error || "Erro ao deletar"); return; }
+  alert("Produto deletado!");
+  load();
+}
+
+function editProduct(id) {
+  window.location.href = `editar.html?id=${id}`;
+}
+
+load();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

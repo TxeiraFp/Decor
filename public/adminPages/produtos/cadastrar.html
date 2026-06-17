@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cadastrar Produto</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body { background:#f5f6fa; font-family:Arial; }
+.card-box {
+  background:#fff;
+  border-radius:15px;
+  padding:25px;
+  box-shadow:0 5px 20px rgba(0,0,0,.05);
+}
+.preview-grid {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:15px;
+}
+.preview-item {
+  position:relative;
+  width:100px;
+  height:100px;
+}
+.preview-item img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:8px;
+  border:1px solid #ddd;
+}
+.preview-item .remove-img {
+  position:absolute;
+  top:-6px;
+  right:-6px;
+  background:red;
+  color:#fff;
+  border:none;
+  border-radius:50%;
+  width:22px;
+  height:22px;
+  font-size:12px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.upload-area {
+  border:2px dashed #ccc;
+  border-radius:10px;
+  padding:20px;
+  text-align:center;
+  cursor:pointer;
+  color:#888;
+  transition:.2s;
+}
+.upload-area:hover { border-color:#333; color:#333; }
+</style>
+</head>
+<body>
+<div class="container py-5">
+  <a href="./index.html" class="btn btn-outline-dark mb-3">← Voltar</a>
+  <div class="card-box">
+    <h4 class="mb-3">➕ Cadastrar Produto</h4>
+    <form onsubmit="createProduct(event)">
+      <input id="name" class="form-control mb-2" placeholder="Nome" required>
+      <textarea id="description" class="form-control mb-2" placeholder="Descrição"></textarea>
+      <input id="price" class="form-control mb-2" placeholder="Preço (ex: 99,90)" required>
+      <select id="categoryId" class="form-control mb-3" required>
+        <option value="">Carregando categorias...</option>
+      </select>
+
+      <h6 class="mt-2">Variante do produto</h6>
+      <input id="size" class="form-control mb-2" placeholder="Tamanho (P, M, G...)">
+      <input id="color" class="form-control mb-2" placeholder="Cor">
+      <input id="stock" type="number" class="form-control mb-2" placeholder="Estoque" value="0">
+
+      <label class="mb-2">Imagens do produto</label>
+
+      <!-- PREVIEW -->
+      <div class="preview-grid" id="previewGrid"></div>
+
+      <!-- UPLOAD AREA -->
+      <div class="upload-area" onclick="document.getElementById('images').click()">
+        📷 Clique para adicionar imagens
+      </div>
+      <input type="file" id="images" class="d-none" multiple accept="image/*" onchange="addImages(this)">
+
+      <button class="btn btn-dark w-100 mt-3" id="btnSubmit">Salvar Produto</button>
+    </form>
+  </div>
+</div>
+
+<script>
+const API = "http://192.168.1.105:8008";
+const token = localStorage.getItem("token");
+
+// Armazena os arquivos selecionados
+let selectedFiles = [];
+
+/* =========================
+   PREVIEW DE IMAGENS
+========================= */
+function addImages(input) {
+  const newFiles = Array.from(input.files);
+  newFiles.forEach(file => {
+    selectedFiles.push(file);
+  });
+  input.value = ""; // limpa o input para permitir re-selecionar
+  renderPreviews();
+}
+
+function removeImage(index) {
+  selectedFiles.splice(index, 1);
+  renderPreviews();
+}
+
+function renderPreviews() {
+  const grid = document.getElementById("previewGrid");
+  grid.innerHTML = selectedFiles.map((file, i) => {
+    const url = URL.createObjectURL(file);
+    return `
+      <div class="preview-item">
+        <img src="${url}" alt="foto ${i+1}">
+        <button type="button" class="remove-img" onclick="removeImage(${i})">✕</button>
+      </div>
+    `;
+  }).join("");
+}
+
+/* =========================
+   CATEGORIAS
+========================= */
+async function loadCategories() {
+  const select = document.getElementById("categoryId");
+  try {
+    const res = await fetch(`${API}/categories`);
+    const data = await res.json();
+    select.innerHTML = `<option value="">Selecione uma categoria</option>`;
+    data.forEach(cat => {
+      select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+      if (cat.children) {
+        cat.children.forEach(child => {
+          select.innerHTML += `<option value="${child.id}">&nbsp;&nbsp;— ${child.name}</option>`;
+        });
+      }
+    });
+  } catch (err) {
+    select.innerHTML = `<option value="">Erro ao carregar categorias</option>`;
+  }
+}
+
+/* =========================
+   UPLOAD
+========================= */
+async function upload(file) {
+  const form = new FormData();
+  form.append("image", file);
+  const res = await fetch(`${API}/upload`, {
+    method: "POST",
+    body: form
+  });
+  const data = await res.json();
+  if (!res.ok || !data.imageUrl) throw new Error("Erro no upload");
+  return data.imageUrl;
+}
+
+/* =========================
+   PREÇO
+========================= */
+function toCents(value) {
+  if (!value) return 0;
+  let clean = value.toString().trim().replace("R$", "").replace(/\./g, "").replace(",", ".");
+  const floatValue = Number(clean);
+  if (isNaN(floatValue)) return 0;
+  return Math.round(floatValue * 100);
+}
+
+/* =========================
+   CREATE PRODUCT
+========================= */
+async function createProduct(e) {
+  e.preventDefault();
+  if (!token) { alert("Você não está logado!"); return; }
+
+  const btn = document.getElementById("btnSubmit");
+  btn.disabled = true;
+  btn.innerText = "Salvando...";
+
+  const name        = document.getElementById("name").value;
+  const description = document.getElementById("description").value;
+  const priceInput  = document.getElementById("price").value;
+  const categoryId  = document.getElementById("categoryId").value;
+  const size        = document.getElementById("size").value;
+  const color       = document.getElementById("color").value;
+  const stock       = document.getElementById("stock").value;
+
+  if (!categoryId) {
+    alert("Selecione uma categoria");
+    btn.disabled = false;
+    btn.innerText = "Salvar Produto";
+    return;
+  }
+
+  const price = toCents(priceInput);
+
+  // Upload das imagens
+  let images = [];
+  try {
+    for (let file of selectedFiles) {
+      const url = await upload(file);
+      images.push(url);
+    }
+  } catch (err) {
+    alert("Erro ao enviar imagens");
+    btn.disabled = false;
+    btn.innerText = "Salvar Produto";
+    return;
+  }
+
+  const variants = [];
+  if (size || color || stock) {
+    variants.push({ size, color, stock: { quantity: Number(stock || 0) } });
+  }
+
+  const payload = { name, description, price, categoryId, images, variants };
+
+  try {
+    const res = await fetch(`${API}/products`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || "Erro ao criar produto");
+      btn.disabled = false;
+      btn.innerText = "Salvar Produto";
+      return;
+    }
+    alert("Produto criado com sucesso!");
+    window.location.href = "./listar.html";
+  } catch (err) {
+    alert("Erro de conexão com servidor");
+    btn.disabled = false;
+    btn.innerText = "Salvar Produto";
+  }
+}
+
+/* INIT */
+loadCategories();
+</script>
+</body>
+</html>
