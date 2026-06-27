@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<title>Produto · Raridade Store</title>
+<style>
+:root{
+  --ink:#111111;
+  --ink-soft:#3a3a3a;
+  --paper:#ffffff;
+  --line:#e7e5e2;
+  --mute:#8c8c8c;
+  --surface:#f7f6f4;
+}
+*{ box-sizing:border-box; }
+html{ overflow-x:hidden; }
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Inter', Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{ text-decoration:none; color:inherit; }
+.brand-serif{ font-family:'Cormorant Garamond', Georgia, serif; }
+img{ max-width:100%; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible{
+  outline:2px solid var(--ink);
+  outline-offset:2px;
+}
+
+/* HEADER */
+.header-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:20px 32px;
+  border-bottom:1px solid var(--line);
+}
+.logo{
+  font-family:'Cormorant Garamond', serif;
+  font-size:28px;
+  font-weight:600;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.icons{ display:flex; align-items:center; gap:26px; }
+.icon{ font-size:21px; cursor:pointer; color:var(--ink); }
+.badge-cart{
+  position:absolute;
+  top:-7px; right:-11px;
+  font-size:10px;
+  background:var(--ink) !important;
+  border:1px solid var(--paper);
+}
+
+/* BREADCRUMB + VOLTAR */
+.breadcrumb-bar{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:16px 32px;
+  border-bottom:1px solid var(--line);
+  font-size:13px;
+  color:var(--mute);
+}
+.breadcrumb-bar .crumbs{
+  overflow-x:auto;
+  white-space:nowrap;
+  flex:1;
+  min-width:0;
+}
+.breadcrumb-bar a:hover{ color:var(--ink); text-decoration:underline; }
+.breadcrumb-bar .current{ color:var(--ink); font-weight:600; }
+
+.btn-back{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex:0 0 auto;
+  border:1px solid var(--line);
+  background:var(--paper);
+  color:var(--ink);
+  font-size:12.5px;
+  letter-spacing:.03em;
+  padding:8px 14px;
+  cursor:pointer;
+  transition:.2s;
+  white-space:nowrap;
+}
+.btn-back:hover{
+  border-color:var(--ink);
+  background:var(--surface);
+}
+.btn-back i{ font-size:14px; }
+
+@media (max-width: 600px){
+  .breadcrumb-bar{ padding:14px 16px; gap:12px; }
+  .btn-back span{ display:none; }
+  .btn-back{ padding:8px 10px; }
+}
+
+/* PRODUCT LAYOUT */
+.product-wrap{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:56px;
+  padding:40px 32px 70px;
+  max-width:1280px;
+  margin:0 auto;
+}
+
+/* GALLERY */
+.gallery{ display:flex; gap:16px; }
+.thumbs{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  flex:0 0 76px;
+}
+.thumb{
+  width:76px;
+  height:76px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  cursor:pointer;
+  overflow:hidden;
+  transition:.2s;
+  flex-shrink:0;
+}
+.thumb img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  background:var(--surface);
+}
+.thumb.active{ border-color:var(--ink); }
+.thumb:hover{ border-color:var(--ink-soft); }
+
+.main-image{
+  flex:1;
+  min-width:0;
+  background:var(--surface);
+  border:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  aspect-ratio:1/1.1;
+  overflow:hidden;
+  position:relative;
+}
+.main-image img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  background:var(--surface);
+}
+.no-image-main{ color:var(--mute); font-size:14px; }
+
+/* INFO */
+.product-info{ max-width:480px; }
+.product-info .cat-label{
+  font-size:12px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--mute);
+  margin-bottom:10px;
+  display:block;
+}
+.product-info h1{
+  font-family:'Cormorant Garamond', serif;
+  font-size:clamp(28px, 4vw, 38px);
+  font-weight:600;
+  line-height:1.15;
+  margin-bottom:14px;
+}
+.product-info .price{
+  font-size:24px;
+  font-weight:700;
+  margin-bottom:24px;
+}
+
+.divider{ border-top:1px solid var(--line); margin:24px 0; }
+
+.option-group{ margin-bottom:22px; }
+.option-group .label{
+  font-size:12px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  margin-bottom:10px;
+  display:block;
+}
+.option-pills{ display:flex; gap:10px; flex-wrap:wrap; }
+.pill{
+  border:1px solid var(--line);
+  padding:9px 18px;
+  font-size:13px;
+  cursor:pointer;
+  transition:.2s;
+  background:var(--paper);
+  color:var(--ink);
+}
+.pill:hover{ border-color:var(--ink); }
+.pill.active{
+  background:var(--ink);
+  color:var(--paper);
+  border-color:var(--ink);
+}
+.pill.disabled{
+  color:var(--mute);
+  text-decoration:line-through;
+  cursor:not-allowed;
+  background:var(--surface);
+}
+
+.stock-info{ font-size:12.5px; color:var(--mute); margin-top:10px; }
+.stock-info.low{ color:#a13d2c; }
+.stock-info.out{ color:#a13d2c; font-weight:600; }
+
+.qty-row{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:24px;
+}
+.qty-control{ display:flex; align-items:center; border:1px solid var(--line); }
+.qty-control button{
+  width:38px;
+  height:38px;
+  background:var(--paper);
+  border:none;
+  font-size:16px;
+  cursor:pointer;
+  transition:.2s;
+}
+.qty-control button:hover{ background:var(--surface); }
+.qty-control span{ width:44px; text-align:center; font-size:14px; font-weight:600; }
+
+.btn-buy{
+  width:100%;
+  background:var(--ink);
+  color:var(--paper);
+  border:1px solid var(--ink);
+  border-radius:0;
+  padding:15px 0;
+  font-size:13px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  font-weight:600;
+  transition:.2s;
+  margin-bottom:12px;
+}
+.btn-buy:hover{ background:#000; }
+.btn-buy:disabled{
+  background:var(--mute);
+  border-color:var(--mute);
+  cursor:not-allowed;
+}
+.btn-wishlist{
+  width:100%;
+  background:var(--paper);
+  color:var(--ink);
+  border:1px solid var(--ink);
+  border-radius:0;
+  padding:14px 0;
+  font-size:13px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  transition:.2s;
+}
+.btn-wishlist:hover{ background:var(--surface); }
+
+.description{
+  font-size:14px;
+  line-height:1.7;
+  color:var(--ink-soft);
+  white-space:pre-line;
+}
+.description-title{
+  font-size:12px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--ink);
+  margin-bottom:12px;
+  font-weight:600;
+}
+
+.trust-row{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  margin-top:28px;
+  padding-top:24px;
+  border-top:1px solid var(--line);
+}
+.trust-item{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  font-size:13px;
+  color:var(--ink-soft);
+}
+.trust-item i{ font-size:18px; color:var(--ink); margin-top:1px; }
+
+.state-msg{
+  text-align:center;
+  color:var(--mute);
+  font-size:14px;
+  padding:80px 0;
+  width:100%;
+}
+
+/* RESPONSIVO */
+@media (max-width: 992px){
+  .product-wrap{ grid-template-columns:1fr; gap:32px; padding:32px 24px 60px; }
+  .product-info{ max-width:none; }
+}
+
+@media (max-width: 600px){
+  .header-top{ padding-left:16px; padding-right:16px; }
+  .product-wrap{ padding:24px 16px 50px; }
+  .gallery{ flex-direction:column-reverse; gap:12px; }
+  .thumbs{
+    flex-direction:row;
+    flex:0 0 auto;
+    overflow-x:auto;
+    -ms-overflow-style:none;
+    scrollbar-width:none;
+  }
+  .thumbs::-webkit-scrollbar{ display:none; }
+  .thumb{ width:64px; height:64px; }
+  .main-image{ aspect-ratio:1/1; }
+  .product-info h1{ font-size:24px; }
+  .product-info .price{ font-size:20px; }
+}
+</style>
+</head>
+<body>
+
+<!--
+  ATENÇÃO — ESTRUTURA DE PASTAS:
+  Este arquivo (produto.html) vive numa SUBPASTA (ex: /produto/produto.html).
+  index.html e categoria.html ficam na pasta RAIZ, um nível acima.
+  Por isso todos os links e o fetch usam "../" na frente.
+  Se você mover este arquivo para a raiz, troque "../" por "./" em todos os lugares abaixo.
+-->
+
+<!-- HEADER -->
+<div class="header-top">
+  <a href="../index.html" class="logo">Raridade</a>
+  <div class="icons">
+    <i class="bi bi-bag icon position-relative" aria-label="Carrinho">
+      <span class="badge bg-dark rounded-pill badge-cart" id="cartCount">0</span>
+    </i>
+  </div>
+</div>
+
+<!-- BREADCRUMB + VOLTAR -->
+<div class="breadcrumb-bar">
+  <button class="btn-back" onclick="goBack()" aria-label="Voltar">
+    <i class="bi bi-arrow-left"></i>
+    <span>Voltar</span>
+  </button>
+  <div class="crumbs">
+    <a href="../index.html">Início</a>
+    <span> / </span>
+    <a href="#" id="breadcrumbCat">Categoria</a>
+    <span> / </span>
+    <span class="current" id="breadcrumbName">Produto</span>
+  </div>
+</div>
+
+<!-- PRODUTO -->
+<div class="product-wrap" id="productWrap">
+  <p class="state-msg">Carregando produto…</p>
+</div>
+
+<script>
+const API = "http://192.168.1.100:8008";
+
+// Caminho relativo para a pasta raiz, já que este arquivo está em uma subpasta
+const ROOT = "../";
+
+const params = new URLSearchParams(window.location.search);
+const productId = params.get("id");
+
+let product = null;
+let selectedVariant = null;
+let qty = 1;
+
+function formatPrice(value){
+  if (value == null) return "R$ 0,00";
+  return "R$ " + (Number(value) / 100).toFixed(2).replace(".", ",");
+}
+
+/* =========================
+   BOTÃO VOLTAR
+   Usa o histórico do navegador se existir. Se não houver histórico
+   (ex: link aberto direto de fora), cai no index na pasta raiz.
+========================= */
+function goBack(){
+  if (window.history.length > 1) {
+    window.history.back();
+  } else {
+    window.location.href = `${ROOT}index.html`;
+  }
+}
+
+async function loadProduct(){
+  if (!productId) {
+    document.getElementById("productWrap").innerHTML =
+      `<p class="state-msg">Produto não especificado.</p>`;
+    return;
+  }
+  try {
+    const res = await fetch(`${API}/products/${productId}`);
+    const data = await res.json();
+
+    if (!res.ok || !data || data.error) {
+      document.getElementById("productWrap").innerHTML =
+        `<p class="state-msg">Produto não encontrado.</p>`;
+      return;
+    }
+
+    product = data;
+    selectedVariant = product.variants?.[0] || null;
+    renderProduct();
+  } catch (err) {
+    console.error(err);
+    document.getElementById("productWrap").innerHTML =
+      `<p class="state-msg">Não foi possível carregar o produto agora.</p>`;
+  }
+}
+
+function renderProduct(){
+  document.title = `${product.name} · Raridade Store`;
+  document.getElementById("breadcrumbName").textContent = product.name;
+
+  const catName = product.category?.name || "";
+  const catId = product.category?.id || product.categoryId;
+  const breadcrumbCat = document.getElementById("breadcrumbCat");
+  breadcrumbCat.textContent = catName || "Categoria";
+  if (catId) {
+    // categoria.html está na raiz, então usa ROOT
+    breadcrumbCat.href = `${ROOT}categoria.html?id=${catId}&nome=${encodeURIComponent(catName)}`;
+  }
+
+  const images = product.images && product.images.length > 0 ? product.images : [];
+
+  const sizes = [...new Set((product.variants || []).map(v => v.size).filter(Boolean))];
+  const colors = [...new Set((product.variants || []).map(v => v.color).filter(Boolean))];
+
+  document.getElementById("productWrap").innerHTML = `
+    <div class="gallery">
+      <div class="thumbs" id="thumbs">
+        ${images.map((img, i) => `
+          <div class="thumb ${i === 0 ? 'active' : ''}" data-index="${i}" onclick="setMainImage(${i})">
+            <img src="${img}" alt="Foto ${i+1}" loading="lazy">
+          </div>
+        `).join("")}
+      </div>
+      <div class="main-image" id="mainImage">
+        ${images.length > 0
+          ? `<img src="${images[0]}" id="mainImageTag" alt="${product.name}">`
+          : `<span class="no-image-main">Sem imagem disponível</span>`
+        }
+      </div>
+    </div>
+
+    <div class="product-info">
+      ${catName ? `<span class="cat-label">${catName}</span>` : ""}
+      <h1 class="brand-serif">${product.name}</h1>
+      <div class="price" id="priceDisplay">${formatPrice(product.price)}</div>
+
+      ${sizes.length > 0 ? `
+        <div class="option-group">
+          <span class="label">Tamanho</span>
+          <div class="option-pills" id="sizePills">
+            ${sizes.map(size => `
+              <div class="pill" data-size="${size}" onclick="selectSize('${size}')">${size}</div>
+            `).join("")}
+          </div>
+        </div>
+      ` : ""}
+
+      ${colors.length > 0 ? `
+        <div class="option-group">
+          <span class="label">Cor</span>
+          <div class="option-pills" id="colorPills">
+            ${colors.map(color => `
+              <div class="pill" data-color="${color}" onclick="selectColor('${color}')">${color}</div>
+            `).join("")}
+          </div>
+        </div>
+      ` : ""}
+
+      <div class="stock-info" id="stockInfo"></div>
+
+      <div class="divider"></div>
+
+      <div class="qty-row">
+        <span class="label" style="margin:0;">Quantidade</span>
+        <div class="qty-control">
+          <button onclick="changeQty(-1)" aria-label="Diminuir">−</button>
+          <span id="qtyDisplay">1</span>
+          <button onclick="changeQty(1)" aria-label="Aumentar">+</button>
+        </div>
+      </div>
+
+      <button class="btn-buy" id="btnBuy" onclick="addToCart()">Adicionar à bolsa</button>
+      <button class="btn-wishlist" onclick="addToWishlist()">
+        <i class="bi bi-heart"></i> Salvar nos favoritos
+      </button>
+
+      <div class="trust-row">
+        <div class="trust-item">
+          <i class="bi bi-truck"></i>
+          <span>Frete grátis em compras acima de R$ 299</span>
+        </div>
+        <div class="trust-item">
+          <i class="bi bi-arrow-counterclockwise"></i>
+          <span>Troca grátis em até 30 dias após a compra</span>
+        </div>
+        <div class="trust-item">
+          <i class="bi bi-shield-check"></i>
+          <span>Pagamento seguro via cartão, Pix ou boleto</span>
+        </div>
+      </div>
+
+      ${product.description ? `
+        <div class="divider"></div>
+        <div class="description-title">Descrição</div>
+        <p class="description">${product.description}</p>
+      ` : ""}
+    </div>
+  `;
+
+  if (sizes.length > 0) selectSize(sizes[0], true);
+  if (colors.length > 0) selectColor(colors[0], true);
+  updateStockInfo();
+}
+
+function setMainImage(index){
+  const images = product.images;
+  document.getElementById("mainImage").innerHTML =
+    `<img src="${images[index]}" id="mainImageTag" alt="${product.name}">`;
+  document.querySelectorAll(".thumb").forEach(t => t.classList.remove("active"));
+  document.querySelector(`.thumb[data-index="${index}"]`)?.classList.add("active");
+}
+
+let selectedSize = null;
+let selectedColor = null;
+
+function selectSize(size, silent){
+  selectedSize = size;
+  document.querySelectorAll("#sizePills .pill").forEach(p => {
+    p.classList.toggle("active", p.dataset.size === size);
+  });
+  if (!silent) updateStockInfo();
+  matchVariant();
+}
+
+function selectColor(color, silent){
+  selectedColor = color;
+  document.querySelectorAll("#colorPills .pill").forEach(p => {
+    p.classList.toggle("active", p.dataset.color === color);
+  });
+  if (!silent) updateStockInfo();
+  matchVariant();
+}
+
+function matchVariant(){
+  selectedVariant = (product.variants || []).find(v =>
+    (selectedSize ? v.size === selectedSize : true) &&
+    (selectedColor ? v.color === selectedColor : true)
+  ) || null;
+  updateStockInfo();
+}
+
+function updateStockInfo(){
+  const el = document.getElementById("stockInfo");
+  const btn = document.getElementById("btnBuy");
+  const stock = selectedVariant?.stock?.quantity ?? null;
+
+  if (stock === null) {
+    el.textContent = "";
+    btn.disabled = false;
+    btn.textContent = "Adicionar à bolsa";
+    return;
+  }
+
+  if (stock <= 0) {
+    el.textContent = "Produto esgotado nesta combinação";
+    el.className = "stock-info out";
+    btn.disabled = true;
+    btn.textContent = "Esgotado";
+  } else if (stock <= 5) {
+    el.textContent = `Últimas ${stock} unidades`;
+    el.className = "stock-info low";
+    btn.disabled = false;
+    btn.textContent = "Adicionar à bolsa";
+  } else {
+    el.textContent = "Em estoque";
+    el.className = "stock-info";
+    btn.disabled = false;
+    btn.textContent = "Adicionar à bolsa";
+  }
+}
+
+function changeQty(delta){
+  qty = Math.max(1, qty + delta);
+  document.getElementById("qtyDisplay").textContent = qty;
+}
+
+function addToCart(){
+  alert("Funcionalidade de carrinho em breve!");
+}
+
+function addToWishlist(){
+  alert("Funcionalidade de favoritos em breve!");
+}
+
+/* INIT */
+loadProduct();
+</script>
+</body>
+</html>

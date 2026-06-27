@@ -22,12 +22,17 @@ const CategoryController = {
     }
   },
 
-  // LIST ALL CATEGORIES
+  // LIST ALL CATEGORIES (somente raízes, com filhos aninhados)
   async getCategories(req, res) {
     try {
       const categories = await prisma.category.findMany({
+        where: { parentId: null },
         include: {
-          children: true,
+          children: {
+            include: {
+              products: true
+            }
+          },
           products: true
         }
       });
@@ -87,40 +92,38 @@ const CategoryController = {
   },
 
   // DELETE CATEGORY
-async deleteCategory(req, res) {
-  const { id } = req.params;
-  try {
-    // Verifica se tem produtos vinculados
-    const products = await prisma.product.count({
-      where: { categoryId: id }
-    });
+  async deleteCategory(req, res) {
+    const { id } = req.params;
+    try {
+      const products = await prisma.product.count({
+        where: { categoryId: id }
+      });
 
-    if (products > 0) {
+      if (products > 0) {
+        return res.status(400).json({
+          error: `Não é possível apagar. Existem ${products} produto(s) nesta categoria.`
+        });
+      }
+
+      await prisma.category.deleteMany({
+        where: { parentId: id }
+      });
+
+      await prisma.category.delete({
+        where: { id }
+      });
+
+      return res.status(200).json({
+        message: "Categoria deletada com sucesso"
+      });
+    } catch (error) {
+      console.error("ERRO DELETE:", error);
       return res.status(400).json({
-        error: `Não é possível apagar. Existem ${products} produto(s) nesta categoria.`
+        error: "Erro ao deletar categoria",
+        details: error.message
       });
     }
-
-    // Apaga subcategorias filhas
-    await prisma.category.deleteMany({
-      where: { parentId: id }
-    });
-
-    await prisma.category.delete({
-      where: { id }
-    });
-
-    return res.status(200).json({
-      message: "Categoria deletada com sucesso"
-    });
-  } catch (error) {
-    console.error("ERRO DELETE:", error);
-    return res.status(400).json({
-      error: "Erro ao deletar categoria",
-      details: error.message
-    });
   }
-}
 };
 
 module.exports = CategoryController;

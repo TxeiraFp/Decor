@@ -3,241 +3,924 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-
 <title>Raridade Store</title>
-
 <style>
-
-body {
-    background: #fff;
-    font-family: Arial, Helvetica, sans-serif;
+/* =========================
+   TOKENS
+========================= */
+:root{
+  --ink:#111111;
+  --ink-soft:#3a3a3a;
+  --paper:#ffffff;
+  --line:#e7e5e2;
+  --mute:#8c8c8c;
+  --surface:#f7f6f4;
+  --accent:#c8a04e; /* usado com muita moderação */
+}
+*{ box-sizing:border-box; }
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Inter', Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+a{ text-decoration:none; color:inherit; }
+.brand-serif{ font-family:'Cormorant Garamond', Georgia, serif; }
+::selection{ background:var(--ink); color:var(--paper); }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible{
+  outline:2px solid var(--ink);
+  outline-offset:2px;
 }
 
-/* HEADER */
-.header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 20px;
-    border-bottom: 1px solid #eee;
+/* =========================
+   TOPBAR
+========================= */
+.topbar{
+  background:var(--ink);
+  color:var(--paper);
+  text-align:center;
+  font-size:11.5px;
+  letter-spacing:.08em;
+  padding:8px 0;
+  text-transform:uppercase;
 }
 
-.logo img {
-    height: 62px;
+/* =========================
+   HEADER
+========================= */
+.header-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:20px 32px;
+  border-bottom:1px solid var(--line);
+  background:var(--paper);
+}
+.logo{
+  font-family:'Cormorant Garamond', serif;
+  font-size:28px;
+  font-weight:600;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.icons{ display:flex; align-items:center; gap:26px; }
+.icon{
+  font-size:21px;
+  cursor:pointer;
+  color:var(--ink);
+  transition:opacity .2s;
+}
+.icon:hover{ opacity:.55; }
+.badge-cart{
+  position:absolute;
+  top:-7px;
+  right:-11px;
+  font-size:10px;
+  background:var(--ink) !important;
+  border:1px solid var(--paper);
 }
 
-/* ICONS */
-.icons {
-    display: flex;
-    align-items: center;
-    gap: 23px;
+/* =========================
+   SEARCH AREA
+========================= */
+.search-area{
+  padding:22px 32px;
+  display:flex;
+  gap:14px;
+  border-bottom:1px solid var(--line);
+  background:var(--paper);
+}
+.search-box{ flex:1; }
+.search-box input{
+  border:1px solid var(--line);
+  border-radius:0;
+  padding:11px 16px;
+  font-size:14px;
+  background:var(--surface);
+}
+.search-box input:focus{
+  border-color:var(--ink);
+  box-shadow:none;
+  background:var(--paper);
+}
+.filters{ display:flex; gap:10px; }
+.filters .form-select{
+  width:150px;
+  border-radius:0;
+  border:1px solid var(--line);
+  font-size:13px;
+  background:var(--surface);
+}
+.filters .form-select:focus{ border-color:var(--ink); box-shadow:none; }
+
+.dropdown-menu{
+  border-radius:0;
+  border:1px solid var(--ink);
+  box-shadow:0 8px 24px rgba(0,0,0,.08);
+  padding:6px 0;
+}
+.dropdown-item{ font-size:13.5px; padding:9px 18px; }
+.dropdown-item:hover, .dropdown-item:focus{ background:var(--ink); color:var(--paper); }
+
+.logged-only{ display:none; }
+body.logged-in .logged-only{ display:block; }
+body.logged-in .not-logged{ display:none; }
+
+/* =========================
+   NAV CATEGORIAS — STICKY
+========================= */
+.nav-categories{
+  position:sticky;
+  top:0;
+  z-index:1030;
+  background:var(--paper);
+  border-bottom:1px solid var(--ink);
+}
+.nav-categories .container{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.nav-link-cat{
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--ink);
+  padding:16px 18px;
+  position:relative;
+  display:inline-block;
+}
+.nav-link-cat::after{
+  content:"";
+  position:absolute;
+  left:18px; right:18px; bottom:10px;
+  height:1px;
+  background:var(--ink);
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:transform .25s ease;
+}
+.nav-link-cat:hover::after{ transform:scaleX(1); }
+.nav-categories .dropdown-toggle::after{ display:none; }
+.nav-categories .dropdown-toggle{ cursor:pointer; }
+.nav-categories .dropdown-menu{ margin-top:0 !important; }
+@media (hover: hover){
+  .nav-categories .dropdown:hover > .dropdown-menu{ display:block; }
 }
 
-.icon {
-    font-size: 26px;
-    cursor: pointer;
+/* =========================
+   HERO CAROUSEL
+========================= */
+.hero-carousel{ background:var(--surface); }
+.hero-carousel .carousel-item img{
+  height:62vh;
+  min-height:340px;
+  max-height:560px;
+  object-fit:cover;
+  width:100%;
+  filter:saturate(.96);
+}
+.hero-carousel .carousel-caption{
+  background:none;
+  bottom:auto;
+  top:50%;
+  transform:translateY(-50%);
+  left:8%;
+  right:auto;
+  text-align:left;
+  max-width:460px;
+  padding:0;
+}
+.hero-carousel .carousel-caption .eyebrow{
+  font-size:11.5px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--paper);
+  opacity:.85;
+  margin-bottom:10px;
+  display:block;
+}
+.hero-carousel .carousel-caption h5{
+  font-family:'Cormorant Garamond', serif;
+  font-size:clamp(28px, 5vw, 48px);
+  font-weight:600;
+  color:var(--paper);
+  margin-bottom:10px;
+  line-height:1.05;
+}
+.hero-carousel .carousel-caption p{
+  color:var(--paper);
+  font-size:14.5px;
+  opacity:.92;
+  margin-bottom:0;
+}
+.hero-carousel .carousel-item::after{
+  content:"";
+  position:absolute; inset:0;
+  background:linear-gradient(90deg, rgba(0,0,0,.42) 0%, rgba(0,0,0,.06) 55%, rgba(0,0,0,0) 75%);
+}
+.hero-carousel .carousel-indicators [data-bs-target]{
+  width:26px;
+  height:2px;
+  background-color:rgba(255,255,255,.55);
+  border:none;
+}
+.hero-carousel .carousel-indicators .active{ background-color:var(--paper); }
+.hero-carousel .carousel-control-prev-icon,
+.hero-carousel .carousel-control-next-icon{ width:1.8rem; height:1.8rem; }
+
+@media (max-width: 768px){
+  .search-area{ flex-direction:column; }
+  .hero-carousel .carousel-item img{ height:46vh; min-height:260px; }
+  .hero-carousel .carousel-caption{ left:6%; max-width:80%; }
+  .header-top{ padding:16px 18px; }
+  .search-area{ padding:16px 18px; }
 }
 
-/* CART */
-.badge-cart {
-    position: absolute;
-    top: -6px;
-    right: -10px;
-    font-size: 10px;
+/* =========================
+   SECTION HEADERS
+========================= */
+.product-section{ padding:48px 0; }
+.product-section + .product-section{
+  border-top:1px solid var(--line);
+}
+.section-title{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  margin-bottom:24px;
+  padding-bottom:14px;
+  border-bottom:1px solid var(--line);
+}
+.section-title .heading{ display:flex; align-items:baseline; gap:12px; }
+.section-title h2{
+  font-family:'Cormorant Garamond', serif;
+  font-size:26px;
+  font-weight:600;
+  letter-spacing:.02em;
+  margin:0;
+}
+.section-title .tag{
+  font-size:11px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--mute);
+}
+.section-title .nav-arrows{ display:flex; gap:8px; }
+.scroll-btn{
+  width:34px;
+  height:34px;
+  border:1px solid var(--line);
+  background:var(--paper);
+  color:var(--ink);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:.2s;
+  font-size:16px;
+}
+.scroll-btn:hover{
+  border-color:var(--ink);
+  background:var(--ink);
+  color:var(--paper);
+}
+.scroll-btn:disabled{
+  opacity:.3;
+  cursor:default;
+}
+.scroll-btn:disabled:hover{
+  border-color:var(--line);
+  background:var(--paper);
+  color:var(--ink);
 }
 
-/* SEARCH */
-.search-area {
-    padding: 42px 20px;
-    display: flex;
-    gap: 12px;
-    border-bottom: 1px solid #eee;
+/* =========================
+   CARROSSEL HORIZONTAL DE PRODUTOS
+========================= */
+.scroll-row{
+  display:flex;
+  gap:20px;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  scroll-behavior:smooth;
+  padding-bottom:6px;
+  -ms-overflow-style:none;
+  scrollbar-width:none;
+}
+.scroll-row::-webkit-scrollbar{ display:none; }
+.scroll-row .scroll-item{
+  flex:0 0 auto;
+  width:220px;
+  scroll-snap-align:start;
+}
+@media (max-width: 768px){
+  .scroll-row .scroll-item{ width:160px; }
+  .section-title .nav-arrows{ display:none; } /* no mobile usa o dedo/swipe */
 }
 
-.search-box {
-    flex: 1;
+/* =========================
+   PRODUTOS (cards)
+========================= */
+.card-prod{
+  border:none;
+  border-radius:0;
+  overflow:hidden;
+  background:transparent;
+  height:100%;
+}
+.card-prod .media{
+  position:relative;
+  background:var(--surface);
+  border:1px solid var(--line);
+}
+.card-prod:hover .media{ border-color:var(--ink); }
+.carousel-inner img{
+  height:240px;
+  object-fit:contain;
+  width:100%;
+  background:var(--surface);
+}
+.no-image{
+  height:240px;
+  background:var(--surface);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--mute);
+  font-size:13px;
+  letter-spacing:.04em;
+}
+.carousel-control-prev-icon,
+.carousel-control-next-icon{
+  background-color:rgba(17,17,17,.55);
+  border-radius:50%;
+  padding:9px;
+  width:1.4rem; height:1.4rem;
+}
+.card-body-min{ padding:14px 2px 0; }
+.card-body-min .cat-label{
+  font-size:11px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--mute);
+  display:block;
+  margin-bottom:4px;
+}
+.card-body-min h6{
+  font-size:14.5px;
+  font-weight:600;
+  margin-bottom:6px;
+  color:var(--ink);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.card-body-min .price{
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:.01em;
+}
+.card-body-min .price .old{
+  font-size:12.5px;
+  font-weight:400;
+  color:var(--mute);
+  text-decoration:line-through;
+  margin-right:6px;
+}
+.badge-promo{
+  position:absolute;
+  top:10px;
+  left:10px;
+  background:var(--ink);
+  color:var(--paper);
+  font-size:10.5px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  padding:4px 9px;
+  z-index:2;
+}
+.btn-add{
+  border:1px solid var(--ink);
+  background:var(--paper);
+  color:var(--ink);
+  border-radius:0;
+  font-size:12px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  padding:8px 0;
+  width:100%;
+  margin-top:12px;
+  transition:.2s;
+}
+.btn-add:hover{ background:var(--ink); color:var(--paper); }
+
+/* full grid (seção "Produtos" completa, abaixo dos carrosséis) */
+.full-grid .scroll-item{ width:auto; }
+
+/* =========================
+   EMPTY / LOADING STATES
+========================= */
+.state-msg{
+  text-align:center;
+  color:var(--mute);
+  font-size:14px;
+  padding:40px 0;
+  width:100%;
 }
 
-.search-box input {
-    border-radius: 25px;
+/* =========================
+   FOOTER
+========================= */
+.site-footer{
+  border-top:1px solid var(--line);
+  margin-top:20px;
+  padding:48px 32px 28px;
+  background:var(--surface);
+}
+.site-footer h6{
+  font-size:12.5px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  margin-bottom:16px;
+  color:var(--ink);
+}
+.site-footer a{
+  font-size:13.5px;
+  color:var(--ink-soft);
+  display:block;
+  margin-bottom:9px;
+}
+.site-footer a:hover{ color:var(--ink); }
+.site-footer .legal{
+  font-size:12px;
+  color:var(--mute);
+  text-align:center;
+  margin-top:36px;
+  letter-spacing:.02em;
 }
 
-/* FILTER */
-.filters {
-    display: flex;
-    gap: 10px;
+@media (prefers-reduced-motion: reduce){
+  *{ transition:none !important; animation-duration:.001s !important; }
 }
-
-.filters .form-select {
-    width: 140px;
-    border-radius: 20px;
-}
-
-/* DROPDOWN */
-.dropdown-menu {
-    border-radius: 12px;
-    border: 1px solid #eee;
-}
-
-/* ESTADO LOGIN */
-.logged-only { display: none; }
-
-body.logged-in .logged-only { display: block; }
-body.logged-in .not-logged { display: none; }
-
-/* MOBILE */
-@media (max-width: 768px) {
-    .search-area {
-        flex-direction: column;
-    }
-}
-
 </style>
 </head>
-
 <body>
+
+<div class="topbar">Frete grátis em compras acima de R$ 299</div>
 
 <!-- HEADER -->
 <div class="header-top">
-
-    <div class="logo">
-        <img src="./assents/RARIDADE-STORE.png">
+  <a href="./index.html" class="logo">Raridade</a>
+  <div class="icons">
+    <div class="dropdown">
+      <i class="bi bi-person icon dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-label="Conta"></i>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li class="not-logged"><a class="dropdown-item" href="./loginPages/index.html">Entrar</a></li>
+        <li class="not-logged"><a class="dropdown-item" href="./registrePages/index.html">Criar conta</a></li>
+        <li class="logged-only"><a class="dropdown-item" href="./perfilPages/perfil.html">Meu perfil</a></li>
+        <li class="logged-only"><hr class="my-1"></li>
+        <li class="logged-only"><a class="dropdown-item" href="#" onclick="logout()">Sair</a></li>
+      </ul>
     </div>
-
-    <div class="icons">
-
-        <!-- PERFIL -->
-        <div class="dropdown">
-
-            <i class="bi bi-person icon dropdown-toggle"
-               data-bs-toggle="dropdown"></i>
-
-            <ul class="dropdown-menu dropdown-menu-end">
-
-                <li class="not-logged">
-                    <a class="dropdown-item" href="./loginPages/index.html">🔐 Login</a>
-                </li>
-
-                <li class="not-logged">
-                    <a class="dropdown-item" href="./registrePages/index.html">📝 Registrar</a>
-                </li>
-
-                <li class="logged-only">
-                    <a class="dropdown-item" href="./perfilPages/perfil.html">👤 Meu Perfil</a>
-                </li>
-
-                <li class="logged-only"><hr></li>
-
-                <li class="logged-only">
-                    <a class="dropdown-item text-danger" href="#" onclick="logout()">
-                        🚪 Sair
-                    </a>
-                </li>
-
-            </ul>
-        </div>
-
-        <!-- CARRINHO -->
-        <div class="position-relative">
-            <i class="bi bi-cart icon"></i>
-            <span class="badge bg-danger badge-cart">2</span>
-        </div>
-
+    <div class="position-relative">
+      <i class="bi bi-bag icon" role="button" aria-label="Carrinho"></i>
+      <span class="badge bg-dark rounded-pill badge-cart" id="cartCount">0</span>
     </div>
-
+  </div>
 </div>
 
 <!-- SEARCH -->
 <div class="search-area">
+  <div class="search-box">
+    <input class="form-control" id="searchInput" placeholder="Buscar produtos" oninput="filterProducts()" aria-label="Buscar produtos">
+  </div>
+  <div class="filters">
+    <select class="form-select" id="filterCategory" onchange="filterProducts()" aria-label="Filtrar por categoria">
+      <option value="">Categoria</option>
+    </select>
+    <select class="form-select" id="filterPrice" onchange="filterProducts()" aria-label="Ordenar por preço">
+      <option value="">Ordenar</option>
+      <option value="asc">Menor preço</option>
+      <option value="desc">Maior preço</option>
+    </select>
+  </div>
+</div>
 
-    <div class="search-box">
-        <input class="form-control" placeholder="Buscar produtos...">
+<!-- NAV CATEGORIAS (sticky) -->
+<nav class="nav-categories">
+  <div class="container" id="navCategories">
+    <a class="nav-link-cat" href="#" onclick="filterByCategory('')">Todos</a>
+  </div>
+</nav>
+
+<!-- HERO CAROUSEL -->
+<div id="heroCarousel" class="carousel slide hero-carousel" data-bs-ride="carousel">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+  </div>
+  <div class="carousel-inner">
+    <div class="carousel-item active position-relative">
+      <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&q=80" alt="Coleção Verão">
+      <div class="carousel-caption">
+        <span class="eyebrow">Nova coleção</span>
+        <h5 class="brand-serif">Verão 2027</h5>
+        <p>Peças recém-chegadas para a estação</p>
+      </div>
     </div>
-
-    <div class="filters">
-        <select class="form-select">
-            <option>Categoria</option>
-            <option>Masculino</option>
-            <option>Feminino</option>
-        </select>
-
-        <select class="form-select">
-            <option>Preço</option>
-            <option>Menor</option>
-            <option>Maior</option>
-        </select>
+    <div class="carousel-item position-relative">
+      <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1600&q=80" alt="Promoções">
+      <div class="carousel-caption">
+        <span class="eyebrow">Por tempo limitado</span>
+        <h5 class="brand-serif">Até 30% off</h5>
+        <p>Em itens selecionados desta semana</p>
+      </div>
     </div>
+    <div class="carousel-item position-relative">
+      <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=1600&q=80" alt="Linha Infantil">
+      <div class="carousel-caption">
+        <span class="eyebrow">Linha infantil</span>
+        <h5 class="brand-serif">Para os pequenos</h5>
+        <p>Conforto e estilo em cada detalhe</p>
+      </div>
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+  </button>
+</div>
+
+<!-- ================= SEÇÕES DE PRODUTOS (carrosséis horizontais) ================= -->
+<div class="container">
+
+  <!-- PRODUTOS -->
+  <section class="product-section">
+    <div class="section-title">
+      <div class="heading">
+        <h2 class="brand-serif">Produtos</h2>
+        <span class="tag" id="countProdutos"></span>
+      </div>
+      <div class="nav-arrows">
+        <button class="scroll-btn" onclick="scrollRow('rowProdutos', -1)" aria-label="Anterior">‹</button>
+        <button class="scroll-btn" onclick="scrollRow('rowProdutos', 1)" aria-label="Próximo">›</button>
+      </div>
+    </div>
+    <div class="scroll-row" id="rowProdutos">
+      <p class="state-msg">Carregando produtos…</p>
+    </div>
+  </section>
+
+  <!-- MAIS VENDIDOS -->
+  <section class="product-section">
+    <div class="section-title">
+      <div class="heading">
+        <h2 class="brand-serif">Mais vendidos</h2>
+        <span class="tag" id="countVendidos"></span>
+      </div>
+      <div class="nav-arrows">
+        <button class="scroll-btn" onclick="scrollRow('rowVendidos', -1)" aria-label="Anterior">‹</button>
+        <button class="scroll-btn" onclick="scrollRow('rowVendidos', 1)" aria-label="Próximo">›</button>
+      </div>
+    </div>
+    <div class="scroll-row" id="rowVendidos">
+      <p class="state-msg">Carregando…</p>
+    </div>
+  </section>
+
+  <!-- PROMOÇÃO -->
+  <section class="product-section">
+    <div class="section-title">
+      <div class="heading">
+        <h2 class="brand-serif">Promoção</h2>
+        <span class="tag" id="countPromo"></span>
+      </div>
+      <div class="nav-arrows">
+        <button class="scroll-btn" onclick="scrollRow('rowPromo', -1)" aria-label="Anterior">‹</button>
+        <button class="scroll-btn" onclick="scrollRow('rowPromo', 1)" aria-label="Próximo">›</button>
+      </div>
+    </div>
+    <div class="scroll-row" id="rowPromo">
+      <p class="state-msg">Carregando…</p>
+    </div>
+  </section>
 
 </div>
 
-<!-- NAV -->
-<nav class="navbar navbar-light bg-light">
-    <div class="container justify-content-center">
-        <a class="nav-link" href="#">Masculino</a>
-        <a class="nav-link" href="#">Feminino</a>
-        <a class="nav-link" href="#">Infantil</a>
-        <a class="nav-link text-danger" href="#">Promoções</a>
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="row gy-4">
+      <div class="col-6 col-md-3">
+        <h6>Raridade</h6>
+        <a href="#">Sobre nós</a>
+        <a href="#">Trabalhe conosco</a>
+      </div>
+      <div class="col-6 col-md-3">
+        <h6>Ajuda</h6>
+        <a href="#">Trocas e devoluções</a>
+        <a href="#">Prazo de entrega</a>
+        <a href="#">Fale com a gente</a>
+      </div>
+      <div class="col-6 col-md-3">
+        <h6>Categorias</h6>
+        <a href="#" onclick="filterByCategory('')">Ver tudo</a>
+      </div>
+      <div class="col-6 col-md-3">
+        <h6>Siga</h6>
+        <a href="#">Instagram</a>
+        <a href="#">WhatsApp</a>
+      </div>
     </div>
-</nav>
+    <div class="legal">© 2026 Raridade Store. Todos os direitos reservados.</div>
+  </div>
+</footer>
 
-<!-- SCRIPT LOGIN/API -->
 <script>
+const API = "http://192.168.1.100:8008";
+let allProducts = [];
+let allCategories = [];
 
-const API = "http://localhost:8008";
-
-/* checar login ao carregar */
-function checkAuth() {
-    const token = localStorage.getItem("token");
-
-    if (token) {
-        document.body.classList.add("logged-in");
-    } else {
-        document.body.classList.remove("logged-in");
-    }
+/* =========================
+   AUTH
+========================= */
+function checkAuth(){
+  const token = localStorage.getItem("token");
+  if (token) document.body.classList.add("logged-in");
+  else document.body.classList.remove("logged-in");
 }
 
-/* login real via API */
-async function login(email, password) {
+async function login(email, password){
+  const res = await fetch(`${API}/session`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
+  });
+  const data = await res.json();
+  if (data.token) {
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.usuario));
+    document.body.classList.add("logged-in");
+    location.reload();
+  } else {
+    alert("Erro ao entrar. Verifique seus dados.");
+  }
+}
 
-    const res = await fetch(`${API}/session`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
+function logout(){
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  document.body.classList.remove("logged-in");
+  location.reload();
+}
+
+/* =========================
+   CATEGORIAS
+========================= */
+async function loadCategories(){
+  try {
+    const res = await fetch(`${API}/categories`);
+    const data = await res.json();
+    if (!Array.isArray(data)) return;
+
+    allCategories = data;
+
+    const select = document.getElementById("filterCategory");
+    select.innerHTML = `<option value="">Categoria</option>`;
+    function fillSelect(list, prefix = ""){
+      list.forEach(cat => {
+        select.innerHTML += `<option value="${cat.id}">${prefix}${cat.name}</option>`;
+        if (cat.children?.length) fillSelect(cat.children, prefix + "— ");
+      });
+    }
+    fillSelect(data);
+
+    const nav = document.getElementById("navCategories");
+    nav.innerHTML = `<a class="nav-link-cat" href="#" onclick="filterByCategory('')">Todos</a>`;
+    data.forEach(cat => {
+      const catUrl = `categoria.html?id=${cat.id}&nome=${encodeURIComponent(cat.name)}`;
+      if (cat.children && cat.children.length > 0) {
+        nav.innerHTML += `
+          <div class="dropdown d-inline-block">
+            <a class="nav-link-cat dropdown-toggle" href="#" data-bs-toggle="dropdown">${cat.name}</a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="${catUrl}">Ver tudo em ${cat.name}</a></li>
+              <li><hr class="dropdown-divider"></li>
+              ${cat.children.map(child => `
+                <li><a class="dropdown-item" href="categoria.html?id=${child.id}&nome=${encodeURIComponent(child.name)}">${child.name}</a></li>
+              `).join("")}
+            </ul>
+          </div>
+        `;
+      } else {
+        nav.innerHTML += `<a class="nav-link-cat" href="${catUrl}">${cat.name}</a>`;
+      }
     });
 
+  } catch (err) {
+    console.error("Erro ao carregar categorias", err);
+  }
+}
+
+/* =========================
+   PRODUTOS — helpers
+========================= */
+function formatPrice(value){
+  if (value == null) return "R$ 0,00";
+  return "R$ " + (Number(value) / 100).toFixed(2).replace(".", ",");
+}
+
+function buildCarousel(images, productId){
+  if (!images || images.length === 0)
+    return `<div class="no-image">Sem imagem</div>`;
+
+  if (images.length === 1)
+    return `<img src="${images[0]}" class="w-100" style="height:240px;object-fit:contain;background:var(--surface);" loading="lazy">`;
+
+  const id = `carousel-${productId}`;
+  const indicators = images.map((_, i) => `
+    <button type="button" data-bs-target="#${id}" data-bs-slide-to="${i}"
+      ${i === 0 ? 'class="active"' : ''} aria-label="Foto ${i+1}"></button>
+  `).join("");
+  const slides = images.map((img, i) => `
+    <div class="carousel-item ${i === 0 ? 'active' : ''}">
+      <img src="${img}" class="d-block w-100" style="height:240px;object-fit:contain;background:var(--surface);" loading="lazy">
+    </div>
+  `).join("");
+
+  return `
+    <div id="${id}" class="carousel slide" data-bs-ride="false">
+      <div class="carousel-indicators">${indicators}</div>
+      <div class="carousel-inner">${slides}</div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#${id}" data-bs-slide="prev" onclick="event.preventDefault(); event.stopPropagation();">
+        <span class="carousel-control-prev-icon"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#${id}" data-bs-slide="next" onclick="event.preventDefault(); event.stopPropagation();">
+        <span class="carousel-control-next-icon"></span>
+      </button>
+    </div>
+  `;
+}
+
+/**
+ * Renderiza um card de produto.
+ * options.promo: quando true, mostra selo de promoção e preço "de/por" simulado (-15%)
+ * Quando você adicionar campos reais de promoção/vendas no banco, troque essa simulação
+ * pelos valores reais (ex: p.discountPrice, p.isPromo, p.salesCount).
+ */
+function productCard(p, options = {}){
+  const category = p.category?.name || "";
+  const isPromo = !!options.promo;
+  const oldPrice = isPromo ? Math.round(p.price / 0.85) : null;
+  const productUrl = `produto/produto.html?id=${p.id}`;
+
+  return `
+    <div class="scroll-item">
+      <div class="card-prod">
+        <a href="${productUrl}" class="media" style="display:block;">
+          ${isPromo ? `<span class="badge-promo">-15%</span>` : ""}
+          ${buildCarousel(p.images, p.id + (options.suffix || ""))}
+        </a>
+        <div class="card-body-min">
+          ${category ? `<span class="cat-label">${category}</span>` : ""}
+          <a href="${productUrl}"><h6 title="${p.name}">${p.name}</h6></a>
+          <div class="price">
+            ${isPromo ? `<span class="old">${formatPrice(oldPrice)}</span>` : ""}
+            ${formatPrice(p.price)}
+          </div>
+          <button class="btn-add" onclick="addToCart('${p.id}')">Adicionar à bolsa</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderRow(elId, countId, products, options = {}){
+  const el = document.getElementById(elId);
+  const count = document.getElementById(countId);
+  count.textContent = products.length ? `${products.length} ${products.length === 1 ? "item" : "itens"}` : "";
+
+  if (products.length === 0) {
+    el.innerHTML = `<p class="state-msg">Nenhum produto encontrado.</p>`;
+    return;
+  }
+  el.innerHTML = products.map(p => productCard(p, options)).join("");
+}
+
+/* =========================
+   CARREGAR E DISTRIBUIR PRODUTOS NAS 3 SEÇÕES
+========================= */
+function renderProducts(products){
+  // Seção "Produtos": lista filtrada/buscada normalmente
+  renderRow("rowProdutos", "countProdutos", products, { suffix: "-all" });
+
+  // Seção "Mais vendidos": simulação — primeiros 7 da lista completa (sem filtro de busca)
+  // TODO: quando existir campo de vendas (ex: salesCount), troque por:
+  // allProducts.slice().sort((a,b)=>b.salesCount-a.salesCount).slice(0,7)
+  const vendidos = allProducts.slice(0, 7);
+  renderRow("rowVendidos", "countVendidos", vendidos, { suffix: "-vendidos" });
+
+  // Seção "Promoção": simulação — últimos 7 da lista completa
+  // TODO: quando existir campo de promoção (ex: isPromo / discountPrice), troque por:
+  // allProducts.filter(p => p.isPromo)
+  const promo = allProducts.slice(-7);
+  renderRow("rowPromo", "countPromo", promo, { promo: true, suffix: "-promo" });
+}
+
+async function loadProducts(){
+  try {
+    const res = await fetch(`${API}/products`);
     const data = await res.json();
-
-    if (data.token) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.usuario));
-
-        document.body.classList.add("logged-in");
-
-        alert("Login OK");
-        location.reload();
-    } else {
-        alert("Erro login");
-    }
+    if (!Array.isArray(data)) return;
+    allProducts = data;
+    renderProducts(allProducts);
+  } catch (err) {
+    document.getElementById("rowProdutos").innerHTML =
+      `<p class="state-msg">Não foi possível carregar os produtos agora.</p>`;
+  }
 }
 
-/* logout */
-function logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
-    document.body.classList.remove("logged-in");
-
-    location.reload();
+/* =========================
+   FILTROS (afetam só a seção "Produtos")
+========================= */
+function getDescendantIds(catId){
+  const ids = [catId];
+  function findChildren(list){
+    list.forEach(cat => {
+      if (cat.parentId === catId || ids.includes(cat.parentId)) {
+        if (!ids.includes(cat.id)) ids.push(cat.id);
+      }
+    });
+  }
+  const flat = [];
+  function flatten(list){
+    list.forEach(cat => {
+      flat.push(cat);
+      if (cat.children?.length) flatten(cat.children);
+    });
+  }
+  flatten(allCategories);
+  findChildren(flat);
+  return ids;
 }
 
+function filterProducts(){
+  const search   = document.getElementById("searchInput").value.toLowerCase();
+  const catId    = document.getElementById("filterCategory").value;
+  const priceOrd = document.getElementById("filterPrice").value;
+
+  const validIds = catId ? getDescendantIds(catId) : null;
+
+  let result = allProducts.filter(p => {
+    const matchName = p.name.toLowerCase().includes(search);
+    const matchCat  = validIds ? validIds.includes(p.categoryId) : true;
+    return matchName && matchCat;
+  });
+
+  if (priceOrd === "asc") result.sort((a, b) => a.price - b.price);
+  if (priceOrd === "desc") result.sort((a, b) => b.price - a.price);
+
+  renderRow("rowProdutos", "countProdutos", result, { suffix: "-all" });
+}
+
+function filterByCategory(catId){
+  document.getElementById("filterCategory").value = catId;
+  filterProducts();
+  document.getElementById("rowProdutos").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/* =========================
+   SCROLL DOS CARROSSÉIS
+========================= */
+function scrollRow(id, direction){
+  const row = document.getElementById(id);
+  const itemWidth = row.querySelector(".scroll-item")?.offsetWidth || 220;
+  row.scrollBy({ left: direction * (itemWidth + 20) * 2, behavior: "smooth" });
+}
+
+/* =========================
+   CARRINHO (placeholder)
+========================= */
+function addToCart(productId){
+  alert("Funcionalidade de carrinho em breve!");
+}
+
+/* INIT */
 checkAuth();
-
+loadCategories();
+loadProducts();
 </script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

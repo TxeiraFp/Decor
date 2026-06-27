@@ -28,7 +28,7 @@ router.post("/", upload.single("image"), (req, res) => {
     }
 
     return res.json({
-        imageUrl: `http://192.168.1.105:8008/uploads/${req.file.filename}`
+        imageUrl : `${process.env.HOST_URL}/uploads/${req.file.filename}`
     });
 });
 

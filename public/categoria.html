@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<title>Categoria · Raridade Store</title>
+<style>
+:root{
+  --ink:#111111;
+  --ink-soft:#3a3a3a;
+  --paper:#ffffff;
+  --line:#e7e5e2;
+  --mute:#8c8c8c;
+  --surface:#f7f6f4;
+}
+*{ box-sizing:border-box; }
+html{ overflow-x:hidden; }
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Inter', Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{ text-decoration:none; color:inherit; }
+.brand-serif{ font-family:'Cormorant Garamond', Georgia, serif; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible{
+  outline:2px solid var(--ink);
+  outline-offset:2px;
+}
+img{ max-width:100%; }
+
+/* HEADER */
+.header-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:20px 32px;
+  border-bottom:1px solid var(--line);
+}
+.logo{
+  font-family:'Cormorant Garamond', serif;
+  font-size:28px;
+  font-weight:600;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+
+/* BREADCRUMB + VOLTAR */
+.breadcrumb-bar{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:16px 32px;
+  border-bottom:1px solid var(--line);
+  font-size:13px;
+  color:var(--mute);
+}
+.breadcrumb-bar .crumbs{
+  overflow-x:auto;
+  white-space:nowrap;
+  flex:1;
+  min-width:0;
+}
+.breadcrumb-bar a:hover{ color:var(--ink); text-decoration:underline; }
+.breadcrumb-bar .current{ color:var(--ink); font-weight:600; }
+
+.btn-back{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex:0 0 auto;
+  border:1px solid var(--line);
+  background:var(--paper);
+  color:var(--ink);
+  font-size:12.5px;
+  letter-spacing:.03em;
+  padding:8px 14px;
+  cursor:pointer;
+  transition:.2s;
+  white-space:nowrap;
+}
+.btn-back:hover{
+  border-color:var(--ink);
+  background:var(--surface);
+}
+.btn-back i{ font-size:14px; }
+
+/* PAGE HEADER */
+.category-header{
+  padding:36px 32px 22px;
+  border-bottom:1px solid var(--line);
+}
+.category-header h1{
+  font-family:'Cormorant Garamond', serif;
+  font-size:clamp(26px, 6vw, 44px);
+  font-weight:600;
+  margin-bottom:6px;
+  line-height:1.1;
+  word-break:break-word;
+}
+.category-header .count{
+  font-size:13px;
+  color:var(--mute);
+  letter-spacing:.03em;
+}
+
+/* SUBCATEGORY CHIPS */
+.subcat-chips{
+  display:flex;
+  gap:10px;
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  padding:18px 32px 4px;
+  -ms-overflow-style:none;
+  scrollbar-width:none;
+}
+.subcat-chips::-webkit-scrollbar{ display:none; }
+.chip{
+  flex:0 0 auto;
+  border:1px solid var(--line);
+  padding:9px 16px;
+  font-size:12.5px;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:.2s;
+  background:var(--paper);
+  color:var(--ink);
+  white-space:nowrap;
+}
+.chip:hover{ border-color:var(--ink); }
+.chip.active{
+  background:var(--ink);
+  color:var(--paper);
+  border-color:var(--ink);
+}
+
+/* TOOLBAR */
+.toolbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:22px 32px 0;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.toolbar .search-wrap{
+  flex:1 1 220px;
+  min-width:0;
+}
+.toolbar .search-wrap input{
+  width:100%;
+  border-radius:0;
+  border:1px solid var(--line);
+  font-size:13px;
+  padding:10px 14px;
+  background:var(--surface);
+}
+.toolbar .search-wrap input:focus{
+  border-color:var(--ink);
+  box-shadow:none;
+  outline:none;
+  background:var(--paper);
+}
+.toolbar .form-select{
+  flex:0 0 auto;
+  width:160px;
+  border-radius:0;
+  border:1px solid var(--line);
+  font-size:13px;
+  background:var(--surface);
+}
+.toolbar .form-select:focus{ border-color:var(--ink); box-shadow:none; }
+
+@media (max-width: 480px){
+  .toolbar{ flex-direction:column; align-items:stretch; }
+  .toolbar .form-select{ width:100%; }
+}
+
+/* =========================
+   LISTA VERTICAL DE PRODUTOS
+========================= */
+.product-list-wrap{
+  padding:26px 32px 60px;
+}
+.product-list{
+  max-width:920px;
+  margin:0 auto;
+}
+.list-item{
+  display:flex;
+  align-items:center;
+  gap:20px;
+  padding:18px 0;
+  border-bottom:1px solid var(--line);
+  transition:background .2s;
+}
+.list-item:hover{ background:var(--surface); }
+.list-item:first-child{ border-top:1px solid var(--line); }
+
+.list-thumb{
+  flex:0 0 auto;
+  width:88px;
+  height:88px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.list-thumb img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  background:var(--surface);
+}
+.list-thumb .no-image{
+  color:var(--mute);
+  font-size:10px;
+  text-align:center;
+  padding:0 6px;
+  line-height:1.3;
+}
+
+.list-info{
+  flex:1 1 auto;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-width:0;
+}
+.list-info .cat-label{
+  font-size:11px;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+  color:var(--mute);
+  margin-bottom:3px;
+}
+.list-info h6{
+  font-size:14.5px;
+  font-weight:600;
+  margin-bottom:3px;
+  color:var(--ink);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.list-info h6:hover{ text-decoration:underline; }
+.list-info .desc{
+  font-size:12.5px;
+  color:var(--ink-soft);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  margin-bottom:0;
+}
+
+.list-side{
+  flex:0 0 auto;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  justify-content:center;
+  gap:8px;
+  min-width:110px;
+  text-align:right;
+}
+.list-side .price{
+  font-size:15px;
+  font-weight:700;
+  white-space:nowrap;
+}
+.btn-add{
+  border:1px solid var(--ink);
+  background:var(--paper);
+  color:var(--ink);
+  border-radius:0;
+  font-size:11.5px;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  padding:7px 14px;
+  transition:.2s;
+  white-space:nowrap;
+}
+.btn-add:hover{ background:var(--ink); color:var(--paper); }
+
+.state-msg{
+  text-align:center;
+  color:var(--mute);
+  font-size:14px;
+  padding:70px 12px;
+  width:100%;
+}
+
+/* =========================
+   RESPONSIVO — TABLET
+========================= */
+@media (max-width: 992px){
+  .header-top, .breadcrumb-bar, .category-header, .subcat-chips, .toolbar, .product-list-wrap{
+    padding-left:24px;
+    padding-right:24px;
+  }
+}
+
+/* =========================
+   RESPONSIVO — MOBILE
+========================= */
+@media (max-width: 600px){
+  .header-top, .breadcrumb-bar, .category-header, .subcat-chips, .toolbar, .product-list-wrap{
+    padding-left:16px;
+    padding-right:16px;
+  }
+  .header-top{ padding-top:16px; padding-bottom:16px; }
+  .logo{ font-size:22px; }
+  .btn-back span{ display:none; }
+  .btn-back{ padding:8px 10px; }
+
+  .category-header{ padding-top:28px; padding-bottom:18px; }
+  .category-header .count{ font-size:12px; }
+
+  .list-item{
+    flex-wrap:wrap;
+    gap:12px;
+    padding:16px 0;
+  }
+  .list-thumb{ width:64px; height:64px; }
+  .list-info{
+    flex:1 1 calc(100% - 64px - 12px);
+    min-width:0;
+  }
+  .list-info h6{ font-size:13.5px; }
+  .list-info .desc{ display:none; }
+  .list-side{
+    flex:1 0 100%;
+    flex-direction:row;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:8px;
+    min-width:0;
+  }
+  .list-side .price{ font-size:14px; }
+  .btn-add{ padding:7px 12px; font-size:11px; }
+}
+
+@media (max-width: 360px){
+  .list-thumb{ width:56px; height:56px; }
+  .category-header h1{ font-size:24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header-top">
+  <a href="./index.html" class="logo">Raridade</a>
+</div>
+
+<!-- BREADCRUMB + VOLTAR -->
+<div class="breadcrumb-bar">
+  <button class="btn-back" onclick="goBack()" aria-label="Voltar">
+    <i class="bi bi-arrow-left"></i>
+    <span>Voltar</span>
+  </button>
+  <div class="crumbs">
+    <a href="./index.html">Início</a>
+    <span> / </span>
+    <span class="current" id="breadcrumbName">Categoria</span>
+  </div>
+</div>
+
+<!-- CATEGORY HEADER -->
+<div class="category-header">
+  <h1 class="brand-serif" id="categoryTitle">Categoria</h1>
+  <div class="count" id="categoryCount"></div>
+</div>
+
+<!-- SUBCATEGORY CHIPS (só aparece se a categoria tiver filhos) -->
+<div class="subcat-chips" id="subcatChips"></div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="search-wrap">
+    <input id="searchInput" placeholder="Buscar nesta categoria" oninput="applyFilters()">
+  </div>
+  <select class="form-select" id="orderSelect" onchange="applyFilters()">
+    <option value="">Ordenar</option>
+    <option value="asc">Menor preço</option>
+    <option value="desc">Maior preço</option>
+  </select>
+</div>
+
+<!-- LISTA -->
+<div class="product-list-wrap">
+  <div class="product-list" id="productList">
+    <p class="state-msg">Carregando produtos…</p>
+  </div>
+</div>
+
+<script>
+const API = "http://192.168.1.100:8008";
+
+const params = new URLSearchParams(window.location.search);
+const categoryId = params.get("id");
+const categoryName = params.get("nome") || "Categoria";
+
+let allCategories = [];
+let categoryProducts = [];
+let validIds = [];
+
+document.getElementById("categoryTitle").textContent = categoryName;
+document.getElementById("breadcrumbName").textContent = categoryName;
+
+/* =========================
+   BOTÃO VOLTAR
+========================= */
+function goBack(){
+  if (window.history.length > 1) {
+    window.history.back();
+  } else {
+    window.location.href = "./index.html";
+  }
+}
+
+/* =========================
+   Pega a categoria + filhos a partir do id
+========================= */
+function findCategory(list, id){
+  for (const cat of list) {
+    if (cat.id === id) return cat;
+    if (cat.children?.length) {
+      const found = findCategory(cat.children, id);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+function collectIds(cat){
+  const ids = [cat.id];
+  if (cat.children?.length) {
+    cat.children.forEach(child => ids.push(...collectIds(child)));
+  }
+  return ids;
+}
+
+async function loadCategoryContext(){
+  try {
+    const res = await fetch(`${API}/categories`);
+    const data = await res.json();
+    allCategories = data;
+
+    const current = findCategory(data, categoryId);
+
+    if (current) {
+      document.getElementById("categoryTitle").textContent = current.name;
+      document.getElementById("breadcrumbName").textContent = current.name;
+      validIds = collectIds(current);
+
+      if (current.children && current.children.length > 0) {
+        const chips = document.getElementById("subcatChips");
+        chips.innerHTML = `<div class="chip active" data-id="">Tudo em ${current.name}</div>` +
+          current.children.map(child => `
+            <div class="chip" data-id="${child.id}">${child.name}</div>
+          `).join("");
+
+        chips.querySelectorAll(".chip").forEach(chip => {
+          chip.addEventListener("click", () => {
+            chips.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+            chip.classList.add("active");
+            const subId = chip.dataset.id;
+            applyFilters(subId || null);
+          });
+        });
+      }
+    } else {
+      validIds = [categoryId];
+    }
+
+    loadProducts();
+  } catch (err) {
+    console.error("Erro ao carregar categorias", err);
+    validIds = [categoryId];
+    loadProducts();
+  }
+}
+
+/* =========================
+   PRODUTOS
+========================= */
+function formatPrice(value){
+  if (value == null) return "R$ 0,00";
+  return "R$ " + (Number(value) / 100).toFixed(2).replace(".", ",");
+}
+
+function renderList(products){
+  const el = document.getElementById("productList");
+  const count = document.getElementById("categoryCount");
+  count.textContent = `${products.length} ${products.length === 1 ? "produto" : "produtos"}`;
+
+  if (products.length === 0) {
+    el.innerHTML = `<p class="state-msg">Nenhum produto encontrado nesta categoria.</p>`;
+    return;
+  }
+
+  el.innerHTML = products.map(p => {
+    const cat = p.category?.name || "";
+    const img = p.images && p.images.length > 0 ? p.images[0] : null;
+    const productUrl = `produto/produto.html?id=${p.id}`;
+
+    return `
+      <div class="list-item">
+        <a class="list-thumb" href="${productUrl}">
+          ${img
+            ? `<img src="${img}" loading="lazy" alt="${p.name}">`
+            : `<span class="no-image">Sem imagem</span>`
+          }
+        </a>
+        <div class="list-info">
+          ${cat ? `<span class="cat-label">${cat}</span>` : ""}
+          <a href="${productUrl}"><h6>${p.name}</h6></a>
+          <p class="desc">${p.description || ""}</p>
+        </div>
+        <div class="list-side">
+          <span class="price">${formatPrice(p.price)}</span>
+          <button class="btn-add" onclick="addToCart('${p.id}')">Adicionar</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+async function loadProducts(){
+  try {
+    const res = await fetch(`${API}/products`);
+    const data = await res.json();
+    if (!Array.isArray(data)) return;
+
+    categoryProducts = data.filter(p => validIds.includes(p.categoryId));
+    applyFilters();
+  } catch (err) {
+    document.getElementById("productList").innerHTML =
+      `<p class="state-msg">Não foi possível carregar os produtos agora.</p>`;
+  }
+}
+
+function applyFilters(subCategoryId){
+  const search = document.getElementById("searchInput").value.toLowerCase();
+  const order  = document.getElementById("orderSelect").value;
+
+  let base = categoryProducts;
+  if (subCategoryId) {
+    base = base.filter(p => p.categoryId === subCategoryId);
+  }
+
+  let result = base.filter(p => p.name.toLowerCase().includes(search));
+
+  if (order === "asc")  result.sort((a, b) => a.price - b.price);
+  if (order === "desc") result.sort((a, b) => b.price - a.price);
+
+  renderList(result);
+}
+
+function addToCart(productId){
+  alert("Funcionalidade de carrinho em breve!");
+}
+
+/* INIT */
+if (!categoryId) {
+  document.getElementById("productList").innerHTML =
+    `<p class="state-msg">Categoria não especificada.</p>`;
+} else {
+  loadCategoryContext();
+}
+</script>
+</body>
+</html>
