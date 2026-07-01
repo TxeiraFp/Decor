@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<title>Sua bolsa — Raridade Store</title>
+<style>
+/* =========================
+   TOKENS (mesmos do index)
+========================= */
+:root{
+--ink:#111111;
+--ink-soft:#3a3a3a;
+--paper:#ffffff;
+--line:#e7e5e2;
+--mute:#8c8c8c;
+--surface:#f7f6f4;
+--accent:#c8a04e;
+}
+*{ box-sizing:border-box; }
+body{
+background:var(--paper);
+color:var(--ink);
+font-family:'Inter', Arial, Helvetica, sans-serif;
+-webkit-font-smoothing:antialiased;
+}
+a{ text-decoration:none; color:inherit; }
+.brand-serif{ font-family:'Cormorant Garamond', Georgia, serif; }
+::selection{ background:var(--ink); color:var(--paper); }
+a:focus-visible, button:focus-visible, input:focus-visible{
+outline:2px solid var(--ink);
+outline-offset:2px;
+}
+/* =========================
+   TOPBAR / HEADER (idênticos ao index)
+========================= */
+.topbar{
+background:var(--ink);
+color:var(--paper);
+text-align:center;
+font-size:11.5px;
+letter-spacing:.08em;
+padding:8px 0;
+text-transform:uppercase;
+}
+.header-top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px 32px;
+border-bottom:1px solid var(--line);
+background:var(--paper);
+}
+.logo{
+font-family:'Cormorant Garamond', serif;
+font-size:28px;
+font-weight:600;
+letter-spacing:.06em;
+text-transform:uppercase;
+}
+.back-link{
+font-size:13px;
+letter-spacing:.04em;
+color:var(--ink-soft);
+display:flex;
+align-items:center;
+gap:6px;
+}
+.back-link:hover{ color:var(--ink); }
+/* =========================
+   PAGE HEAD
+========================= */
+.page-head{
+padding:40px 32px 24px;
+border-bottom:1px solid var(--line);
+}
+.page-head h1{
+font-family:'Cormorant Garamond', serif;
+font-size:32px;
+font-weight:600;
+margin:0;
+}
+.page-head .sub{
+font-size:13px;
+color:var(--mute);
+margin-top:4px;
+}
+/* =========================
+   LAYOUT
+========================= */
+.cart-wrap{
+max-width:1100px;
+margin:0 auto;
+padding:40px 32px 80px;
+display:grid;
+grid-template-columns:1fr 340px;
+gap:56px;
+align-items:start;
+}
+@media (max-width: 860px){
+.cart-wrap{ grid-template-columns:1fr; padding:28px 18px 60px; gap:32px; }
+.header-top{ padding:16px 18px; }
+.page-head{ padding:28px 18px 20px; }
+}
+/* =========================
+   CART ITEMS
+========================= */
+.cart-items{ display:flex; flex-direction:column; }
+.cart-item{
+display:grid;
+grid-template-columns:110px 1fr auto;
+gap:20px;
+padding:24px 0;
+border-bottom:1px solid var(--line);
+align-items:start;
+}
+.cart-item img{
+width:110px;
+height:110px;
+object-fit:contain;
+background:var(--surface);
+border:1px solid var(--line);
+}
+.item-info .cat-label{
+font-size:10.5px;
+letter-spacing:.08em;
+text-transform:uppercase;
+color:var(--mute);
+display:block;
+margin-bottom:4px;
+}
+.item-info h6{
+font-size:15px;
+font-weight:600;
+margin-bottom:8px;
+}
+.item-info .unit-price{
+font-size:12.5px;
+color:var(--mute);
+}
+.qty-control{
+display:flex;
+align-items:center;
+border:1px solid var(--line);
+width:fit-content;
+margin-top:12px;
+}
+.qty-control button{
+width:30px;
+height:30px;
+border:none;
+background:var(--paper);
+font-size:15px;
+cursor:pointer;
+transition:.2s;
+}
+.qty-control button:hover{ background:var(--ink); color:var(--paper); }
+.qty-control span{
+width:34px;
+text-align:center;
+font-size:13.5px;
+font-weight:600;
+}
+.item-side{
+text-align:right;
+display:flex;
+flex-direction:column;
+align-items:flex-end;
+gap:14px;
+}
+.item-total{
+font-size:15px;
+font-weight:700;
+}
+.remove-btn{
+font-size:12px;
+letter-spacing:.04em;
+color:var(--mute);
+background:none;
+border:none;
+cursor:pointer;
+padding:0;
+display:flex;
+align-items:center;
+gap:5px;
+}
+.remove-btn:hover{ color:var(--ink); }
+/* =========================
+   EMPTY / LOADING
+========================= */
+.state-box{
+text-align:center;
+padding:70px 20px;
+grid-column:1 / -1;
+}
+.state-box .icon-empty{
+font-size:38px;
+color:var(--line);
+margin-bottom:16px;
+display:block;
+}
+.state-box h5{
+font-family:'Cormorant Garamond', serif;
+font-size:22px;
+margin-bottom:8px;
+}
+.state-box p{
+font-size:13.5px;
+color:var(--mute);
+margin-bottom:22px;
+}
+.btn-outline-ink{
+border:1px solid var(--ink);
+background:var(--paper);
+color:var(--ink);
+border-radius:0;
+font-size:12.5px;
+letter-spacing:.06em;
+text-transform:uppercase;
+padding:11px 26px;
+transition:.2s;
+display:inline-block;
+}
+.btn-outline-ink:hover{ background:var(--ink); color:var(--paper); }
+/* =========================
+   SUMMARY
+========================= */
+.summary-box{
+border:1px solid var(--line);
+padding:28px 24px;
+position:sticky;
+top:24px;
+}
+.summary-box h5{
+font-family:'Cormorant Garamond', serif;
+font-size:20px;
+font-weight:600;
+margin-bottom:20px;
+padding-bottom:14px;
+border-bottom:1px solid var(--line);
+}
+.summary-row{
+display:flex;
+justify-content:space-between;
+font-size:13.5px;
+margin-bottom:12px;
+color:var(--ink-soft);
+}
+.summary-row.total{
+font-size:16px;
+font-weight:700;
+color:var(--ink);
+padding-top:14px;
+margin-top:6px;
+border-top:1px solid var(--line);
+}
+.summary-row .free{
+color:var(--ink);
+font-weight:600;
+}
+.btn-checkout{
+width:100%;
+border:1px solid var(--ink);
+background:var(--ink);
+color:var(--paper);
+border-radius:0;
+font-size:13px;
+letter-spacing:.06em;
+text-transform:uppercase;
+padding:14px 0;
+margin-top:20px;
+transition:.2s;
+}
+.btn-checkout:hover{ background:var(--paper); color:var(--ink); }
+.btn-checkout:disabled{
+opacity:.4;
+cursor:default;
+}
+.summary-note{
+font-size:11.5px;
+color:var(--mute);
+margin-top:14px;
+text-align:center;
+line-height:1.5;
+}
+</style>
+</head>
+<body>
+<div class="topbar">Frete grátis em compras acima de R$ 299</div>
+<div class="header-top">
+<a href="../index.html" class="logo">Raridade</a>
+<a href="../index.html" class="back-link">
+<i class="bi bi-arrow-left"></i> Continuar comprando
+</a>
+</div>
+<div class="page-head">
+<h1 class="brand-serif">Sua bolsa</h1>
+<div class="sub" id="itemCountLabel">Carregando…</div>
+</div>
+<div class="cart-wrap" id="cartWrap">
+<div class="cart-items" id="cartItems">
+<p class="state-box">Carregando sua bolsa…</p>
+</div>
+</div>
+<script>
+const API = "http://192.168.1.100:8008";
+let cartData = { items: [] };
+function authHeaders(){
+const token = localStorage.getItem("token");
+return token ? { "Authorization": `Bearer ${token}` } : {};
+}
+function formatPrice(value){
+if (value == null) return "R$ 0,00";
+return "R$ " + (Number(value) / 100).toFixed(2).replace(".", ",");
+}
+function requireLogin(){
+const token = localStorage.getItem("token");
+if (!token) {
+
+window.location.href = "../loginPages/index.html";
+return false;
+  }
+return true;
+}
+function renderEmpty(){
+document.getElementById("itemCountLabel").textContent = "Sua bolsa está vazia";
+document.getElementById("cartWrap").innerHTML = `
+    <div class="state-box">
+      <i class="bi bi-bag icon-empty"></i>
+      <h5 class="brand-serif">Sua bolsa está vazia</h5>
+      <p>Explore nossos produtos e adicione algo especial.</p>
+      <a href="../index.html" class="btn-outline-ink">Ver produtos</a>
+    </div>
+  `;
+}
+function renderCart(){
+const items = cartData.items || [];
+if (items.length === 0) {
+renderEmpty();
+return;
+  }
+document.getElementById("itemCountLabel").textContent =
+`${items.length} ${items.length === 1 ? "item" : "itens"} na bolsa`;
+const itemsHtml = items.map(it => {
+const v = it.variant || {};
+const p = v.product || {};
+const img = (p.images && p.images[0]) || "";
+const variantLabel = [v.size, v.color].filter(Boolean).join(" — ");
+const stockQty = v.stock?.quantity ?? null;
+const lineTotal = (p.price || 0) * it.quantity;
+return `
+      <div class="cart-item" data-item-id="${it.id}">
+${img
+? `<img src="${img}" alt="${p.name || ''}">`
+: `<div style="width:110px;height:110px;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:11px;">Sem imagem</div>`}
+        <div class="item-info">
+${variantLabel ? `<span class="cat-label">${variantLabel}</span>` : ""}
+          <h6>${p.name || "Produto"}</h6>
+          <div class="unit-price">${formatPrice(p.price)} / unidade</div>
+${stockQty !== null && stockQty < it.quantity
+? `<div style="font-size:11.5px;color:#b23b3b;margin-top:4px;">Apenas ${stockQty} em estoque</div>`
+: ""}
+          <div class="qty-control">
+            <button onclick="changeQty('${it.id}', ${it.quantity - 1})" aria-label="Diminuir quantidade">−</button>
+            <span>${it.quantity}</span>
+            <button onclick="changeQty('${it.id}', ${it.quantity + 1})" aria-label="Aumentar quantidade">+</button>
+          </div>
+        </div>
+        <div class="item-side">
+          <div class="item-total">${formatPrice(lineTotal)}</div>
+          <button class="remove-btn" onclick="removeItem('${it.id}')">
+            <i class="bi bi-trash"></i> Remover
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("");
+const subtotal = items.reduce((sum, it) => sum + ((it.variant?.product?.price || 0) * it.quantity), 0);
+const freeShippingThreshold = 29900; // R$ 299,00 em centavos
+const frete = subtotal >= freeShippingThreshold ? 0 : null;
+document.getElementById("cartWrap").innerHTML = `
+    <div class="cart-items" id="cartItems">${itemsHtml}</div>
+    <div class="summary-box">
+      <h5 class="brand-serif">Resumo</h5>
+      <div class="summary-row">
+        <span>Subtotal</span>
+        <span>${formatPrice(subtotal)}</span>
+      </div>
+      <div class="summary-row">
+        <span>Frete</span>
+        <span>${frete === 0 ? '<span class="free">Grátis</span>' : "Calculado no checkout"}</span>
+      </div>
+      <div class="summary-row total">
+        <span>Total</span>
+        <span>${formatPrice(subtotal)}</span>
+      </div>
+      <button class="btn-checkout" onclick="checkout()">Finalizar compra</button>
+      <div class="summary-note">Frete grátis em compras acima de R$ 299,00</div>
+    </div>
+  `;
+}
+async function loadCart(){
+try {
+const res = await fetch(`${API}/cart`, { headers: authHeaders() });
+if (res.status === 404) {
+// Ainda não existe carrinho para esse usuário (nunca adicionou nada) — não é erro
+cartData.items = [];
+renderCart();
+return;
+    }
+if (!res.ok) throw new Error("Falha ao carregar carrinho");
+const data = await res.json();
+cartData.items = Array.isArray(data.items) ? data.items : (Array.isArray(data) ? data : []);
+renderCart();
+  } catch (err) {
+console.error("Erro ao carregar carrinho", err);
+document.getElementById("cartWrap").innerHTML = `
+      <div class="state-box">
+        <h5 class="brand-serif">Não foi possível carregar sua bolsa</h5>
+        <p>Tente novamente em instantes.</p>
+        <a href="../index.html" class="btn-outline-ink">Voltar à loja</a>
+      </div>
+    `;
+  }
+}
+async function changeQty(itemId, newQty){
+if (newQty < 1) {
+removeItem(itemId);
+return;
+  }
+try {
+const res = await fetch(`${API}/cart/items/${itemId}`, {
+method: "PUT",
+headers: { "Content-Type": "application/json", ...authHeaders() },
+body: JSON.stringify({ quantity: newQty })
+    });
+if (!res.ok) throw new Error("Falha ao atualizar quantidade");
+await loadCart();
+  } catch (err) {
+console.error("Erro ao atualizar quantidade", err);
+alert("Não foi possível atualizar a quantidade agora.");
+  }
+}
+async function removeItem(itemId){
+try {
+const res = await fetch(`${API}/cart/items/${itemId}`, {
+method: "DELETE",
+headers: authHeaders()
+    });
+if (!res.ok) throw new Error("Falha ao remover item");
+await loadCart();
+  } catch (err) {
+console.error("Erro ao remover item", err);
+alert("Não foi possível remover o item agora.");
+  }
+}
+function checkout(){
+alert("Checkout em breve! Sua bolsa foi salva.");
+}
+/* INIT */
+if (requireLogin()) {
+loadCart();
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
